@@ -1,0 +1,18 @@
+node_modules/
+dist/
+.vite/
+.pytest_cache/
+__pycache__/
+*.py[cod]
+*.tsbuildinfo
+
+# Local Windows cache folder that may appear when system variables are unresolved.
+%SystemDrive%/
+
+# Local-only environment files and secrets.
+.env
+.env.*
+*.pem
+*.key
+*.p12
+*.pfx
