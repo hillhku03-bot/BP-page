@@ -1,0 +1,38 @@
+[
+  {
+    "event_group": "BLAST SLAM VII",
+    "match_count": 102,
+    "first_match": "2026-05-26 16:34:09",
+    "last_match": "2026-06-08 03:07:21"
+  },
+  {
+    "event_group": "DreamLeague Season 29",
+    "match_count": 185,
+    "first_match": "2026-05-13 18:26:40",
+    "last_match": "2026-05-25 03:52:45"
+  },
+  {
+    "event_group": "ESL One Birmingham 2026",
+    "match_count": 78,
+    "first_match": "2026-03-24 20:27:55",
+    "last_match": "2026-03-30 04:08:04"
+  },
+  {
+    "event_group": "EWC 2026 Regional Qualifiers",
+    "match_count": 262,
+    "first_match": "2026-05-29 11:38:34",
+    "last_match": "2026-06-05 21:42:40"
+  },
+  {
+    "event_group": "PGL Wallachia 2026 Season 8",
+    "match_count": 119,
+    "first_match": "2026-04-18 15:30:12",
+    "last_match": "2026-04-26 22:39:31"
+  },
+  {
+    "event_group": "TI 2026 Regional Qualifiers",
+    "match_count": 188,
+    "first_match": "2026-06-15 12:32:39",
+    "last_match": "2026-06-29 01:53:06"
+  }
+]

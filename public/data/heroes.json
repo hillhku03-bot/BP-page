@@ -1,0 +1,1018 @@
+[
+  {
+    "hero_id": 6,
+    "hero_name_en1": "DrowRanger",
+    "hero_name_en2": "Drow Ranger",
+    "hero_name": "npc_dota_hero_drow_ranger",
+    "hero_name_cn": "卓尔游侠",
+    "hero_name_cn2": "小黑"
+  },
+  {
+    "hero_id": 10,
+    "hero_name_en1": "Morphling",
+    "hero_name_en2": "Morphling",
+    "hero_name": "npc_dota_hero_morphling",
+    "hero_name_cn": "变体精灵",
+    "hero_name_cn2": "水人"
+  },
+  {
+    "hero_id": 12,
+    "hero_name_en1": "PhantomLancer",
+    "hero_name_en2": "Phantom Lancer",
+    "hero_name": "npc_dota_hero_phantom_lancer",
+    "hero_name_cn": "幻影长矛手",
+    "hero_name_cn2": "小猴"
+  },
+  {
+    "hero_id": 18,
+    "hero_name_en1": "Sven",
+    "hero_name_en2": "Sven",
+    "hero_name": "npc_dota_hero_sven",
+    "hero_name_cn": "斯温",
+    "hero_name_cn2": "Sven"
+  },
+  {
+    "hero_id": 20,
+    "hero_name_en1": "VengefulSpirit",
+    "hero_name_en2": "Vengeful Spirit",
+    "hero_name": "npc_dota_hero_vengefulspirit",
+    "hero_name_cn": "复仇之魂",
+    "hero_name_cn2": "VS"
+  },
+  {
+    "hero_id": 30,
+    "hero_name_en1": "WitchDoctor",
+    "hero_name_en2": "Witch Doctor",
+    "hero_name": "npc_dota_hero_witch_doctor",
+    "hero_name_cn": "巫医",
+    "hero_name_cn2": "巫医"
+  },
+  {
+    "hero_id": 35,
+    "hero_name_en1": "Sniper",
+    "hero_name_en2": "Sniper",
+    "hero_name": "npc_dota_hero_sniper",
+    "hero_name_cn": "狙击手",
+    "hero_name_cn2": "火枪"
+  },
+  {
+    "hero_id": 37,
+    "hero_name_en1": "Warlock",
+    "hero_name_en2": "Warlock",
+    "hero_name": "npc_dota_hero_warlock",
+    "hero_name_cn": "术士",
+    "hero_name_cn2": "术士"
+  },
+  {
+    "hero_id": 41,
+    "hero_name_en1": "FacelessVoid",
+    "hero_name_en2": "Faceless Void",
+    "hero_name": "npc_dota_hero_faceless_void",
+    "hero_name_cn": "虚空假面",
+    "hero_name_cn2": "虚空"
+  },
+  {
+    "hero_id": 47,
+    "hero_name_en1": "Viper",
+    "hero_name_en2": "Viper",
+    "hero_name": "npc_dota_hero_viper",
+    "hero_name_cn": "冥界亚龙",
+    "hero_name_cn2": "毒龙"
+  },
+  {
+    "hero_id": 49,
+    "hero_name_en1": "DragonKnight",
+    "hero_name_en2": "Dragon Knight",
+    "hero_name": "npc_dota_hero_dragon_knight",
+    "hero_name_cn": "龙骑士",
+    "hero_name_cn2": "龙骑"
+  },
+  {
+    "hero_id": 55,
+    "hero_name_en1": "DarkSeer",
+    "hero_name_en2": "Dark Seer",
+    "hero_name": "npc_dota_hero_dark_seer",
+    "hero_name_cn": "黑暗贤者",
+    "hero_name_cn2": "DS"
+  },
+  {
+    "hero_id": 59,
+    "hero_name_en1": "Huskar",
+    "hero_name_en2": "Huskar",
+    "hero_name": "npc_dota_hero_huskar",
+    "hero_name_cn": "哈斯卡",
+    "hero_name_cn2": "哈斯卡"
+  },
+  {
+    "hero_id": 61,
+    "hero_name_en1": "Broodmother",
+    "hero_name_en2": "Broodmother",
+    "hero_name": "npc_dota_hero_broodmother",
+    "hero_name_cn": "育母蜘蛛",
+    "hero_name_cn2": "蜘蛛"
+  },
+  {
+    "hero_id": 65,
+    "hero_name_en1": "Batrider",
+    "hero_name_en2": "Batrider",
+    "hero_name": "npc_dota_hero_batrider",
+    "hero_name_cn": "蝙蝠骑士",
+    "hero_name_cn2": "蝙蝠"
+  },
+  {
+    "hero_id": 71,
+    "hero_name_en1": "SpiritBreaker",
+    "hero_name_en2": "Spirit Breaker",
+    "hero_name": "npc_dota_hero_spirit_breaker",
+    "hero_name_cn": "裂魂人",
+    "hero_name_cn2": "白牛"
+  },
+  {
+    "hero_id": 75,
+    "hero_name_en1": "Silencer",
+    "hero_name_en2": "Silencer",
+    "hero_name": "npc_dota_hero_silencer",
+    "hero_name_cn": "沉默术士",
+    "hero_name_cn2": "沉默"
+  },
+  {
+    "hero_id": 77,
+    "hero_name_en1": "Lycan",
+    "hero_name_en2": "Lycan",
+    "hero_name": "npc_dota_hero_lycan",
+    "hero_name_cn": "狼人",
+    "hero_name_cn2": "狼人"
+  },
+  {
+    "hero_id": 83,
+    "hero_name_en1": "Treant",
+    "hero_name_en2": "Treant Protector",
+    "hero_name": "npc_dota_hero_treant",
+    "hero_name_cn": "树精卫士",
+    "hero_name_cn2": "大树"
+  },
+  {
+    "hero_id": 85,
+    "hero_name_en1": "Undying",
+    "hero_name_en2": "Undying",
+    "hero_name": "npc_dota_hero_undying",
+    "hero_name_cn": "不朽尸王",
+    "hero_name_cn2": "尸王"
+  },
+  {
+    "hero_id": 89,
+    "hero_name_en1": "Naga_Siren",
+    "hero_name_en2": "Naga Siren",
+    "hero_name": "npc_dota_hero_naga_siren",
+    "hero_name_cn": "娜迦海妖",
+    "hero_name_cn2": "娜迦"
+  },
+  {
+    "hero_id": 95,
+    "hero_name_en1": "TrollWarlord",
+    "hero_name_en2": "Troll Warlord",
+    "hero_name": "npc_dota_hero_troll_warlord",
+    "hero_name_cn": "巨魔战将",
+    "hero_name_cn2": "巨魔"
+  },
+  {
+    "hero_id": 98,
+    "hero_name_en1": "Shredder",
+    "hero_name_en2": "Timbersaw",
+    "hero_name": "npc_dota_hero_shredder",
+    "hero_name_cn": "伐木机",
+    "hero_name_cn2": "伐木机"
+  },
+  {
+    "hero_id": 100,
+    "hero_name_en1": "Tusk",
+    "hero_name_en2": "Tusk",
+    "hero_name": "npc_dota_hero_tusk",
+    "hero_name_cn": "巨牙海民",
+    "hero_name_cn2": "海民"
+  },
+  {
+    "hero_id": 104,
+    "hero_name_en1": "Legion_Commander",
+    "hero_name_en2": "Legion Commander",
+    "hero_name": "npc_dota_hero_legion_commander",
+    "hero_name_cn": "军团指挥官",
+    "hero_name_cn2": "军团"
+  },
+  {
+    "hero_id": 110,
+    "hero_name_en1": "Phoenix",
+    "hero_name_en2": "Phoenix",
+    "hero_name": "npc_dota_hero_phoenix",
+    "hero_name_cn": "凤凰",
+    "hero_name_cn2": "凤凰"
+  },
+  {
+    "hero_id": 112,
+    "hero_name_en1": "Winter_Wyvern",
+    "hero_name_en2": "Winter Wyvern",
+    "hero_name": "npc_dota_hero_winter_wyvern",
+    "hero_name_cn": "寒冬飞龙",
+    "hero_name_cn2": "冰龙"
+  },
+  {
+    "hero_id": 136,
+    "hero_name_en1": "Marci",
+    "hero_name_en2": "Marci",
+    "hero_name": "npc_dota_hero_marci",
+    "hero_name_cn": "玛西",
+    "hero_name_cn2": "马西"
+  },
+  {
+    "hero_id": 1,
+    "hero_name_en1": "AntiMage",
+    "hero_name_en2": "Anti-Mage",
+    "hero_name": "npc_dota_hero_antimage",
+    "hero_name_cn": "敌法师",
+    "hero_name_cn2": "敌法"
+  },
+  {
+    "hero_id": 7,
+    "hero_name_en1": "Earthshaker",
+    "hero_name_en2": "Earthshaker",
+    "hero_name": "npc_dota_hero_earthshaker",
+    "hero_name_cn": "撼地者",
+    "hero_name_cn2": "牛头"
+  },
+  {
+    "hero_id": 11,
+    "hero_name_en1": "Nevermore",
+    "hero_name_en2": "Shadow Fiend",
+    "hero_name": "npc_dota_hero_nevermore",
+    "hero_name_cn": "影魔",
+    "hero_name_cn2": "SF"
+  },
+  {
+    "hero_id": 13,
+    "hero_name_en1": "Puck",
+    "hero_name_en2": "Puck",
+    "hero_name": "npc_dota_hero_puck",
+    "hero_name_cn": "帕克",
+    "hero_name_cn2": "帕克"
+  },
+  {
+    "hero_id": 19,
+    "hero_name_en1": "Tiny",
+    "hero_name_en2": "Tiny",
+    "hero_name": "npc_dota_hero_tiny",
+    "hero_name_cn": "小小",
+    "hero_name_cn2": "小小"
+  },
+  {
+    "hero_id": 21,
+    "hero_name_en1": "Windrunner",
+    "hero_name_en2": "Windranger",
+    "hero_name": "npc_dota_hero_windrunner",
+    "hero_name_cn": "风行者",
+    "hero_name_cn2": "风行"
+  },
+  {
+    "hero_id": 25,
+    "hero_name_en1": "Lina",
+    "hero_name_en2": "Lina",
+    "hero_name": "npc_dota_hero_lina",
+    "hero_name_cn": "莉娜",
+    "hero_name_cn2": "火女"
+  },
+  {
+    "hero_id": 31,
+    "hero_name_en1": "Lich",
+    "hero_name_en2": "Lich",
+    "hero_name": "npc_dota_hero_lich",
+    "hero_name_cn": "巫妖",
+    "hero_name_cn2": "巫妖"
+  },
+  {
+    "hero_id": 34,
+    "hero_name_en1": "Tinker",
+    "hero_name_en2": "Tinker",
+    "hero_name": "npc_dota_hero_tinker",
+    "hero_name_cn": "修补匠",
+    "hero_name_cn2": "TK"
+  },
+  {
+    "hero_id": 36,
+    "hero_name_en1": "Necrolyte",
+    "hero_name_en2": "Necrophos",
+    "hero_name": "npc_dota_hero_necrolyte",
+    "hero_name_cn": "瘟疫法师",
+    "hero_name_cn2": "NEC"
+  },
+  {
+    "hero_id": 40,
+    "hero_name_en1": "Venomancer",
+    "hero_name_en2": "Venomancer",
+    "hero_name": "npc_dota_hero_venomancer",
+    "hero_name_cn": "剧毒术士",
+    "hero_name_cn2": "剧毒"
+  },
+  {
+    "hero_id": 46,
+    "hero_name_en1": "TemplarAssassin",
+    "hero_name_en2": "Templar Assassin",
+    "hero_name": "npc_dota_hero_templar_assassin",
+    "hero_name_cn": "圣堂刺客",
+    "hero_name_cn2": "TA"
+  },
+  {
+    "hero_id": 48,
+    "hero_name_en1": "Luna",
+    "hero_name_en2": "Luna",
+    "hero_name": "npc_dota_hero_luna",
+    "hero_name_cn": "露娜",
+    "hero_name_cn2": "露娜"
+  },
+  {
+    "hero_id": 54,
+    "hero_name_en1": "Life_Stealer",
+    "hero_name_en2": "Lifestealer",
+    "hero_name": "npc_dota_hero_life_stealer",
+    "hero_name_cn": "噬魂鬼",
+    "hero_name_cn2": "小狗"
+  },
+  {
+    "hero_id": 58,
+    "hero_name_en1": "Enchantress",
+    "hero_name_en2": "Enchantress",
+    "hero_name": "npc_dota_hero_enchantress",
+    "hero_name_cn": "魅惑魔女",
+    "hero_name_cn2": "小鹿"
+  },
+  {
+    "hero_id": 60,
+    "hero_name_en1": "NightStalker",
+    "hero_name_en2": "Night Stalker",
+    "hero_name": "npc_dota_hero_night_stalker",
+    "hero_name_cn": "暗夜魔王",
+    "hero_name_cn2": "夜魔"
+  },
+  {
+    "hero_id": 64,
+    "hero_name_en1": "Jakiro",
+    "hero_name_en2": "Jakiro",
+    "hero_name": "npc_dota_hero_jakiro",
+    "hero_name_cn": "杰奇洛",
+    "hero_name_cn2": "双头龙"
+  },
+  {
+    "hero_id": 70,
+    "hero_name_en1": "Ursa",
+    "hero_name_en2": "Ursa",
+    "hero_name": "npc_dota_hero_ursa",
+    "hero_name_cn": "熊战士",
+    "hero_name_cn2": "拍拍"
+  },
+  {
+    "hero_id": 74,
+    "hero_name_en1": "Invoker",
+    "hero_name_en2": "Invoker",
+    "hero_name": "npc_dota_hero_invoker",
+    "hero_name_cn": "祈求者",
+    "hero_name_cn2": "卡尔"
+  },
+  {
+    "hero_id": 76,
+    "hero_name_en1": "Obsidian_Destroyer",
+    "hero_name_en2": "Outworld Destroyer",
+    "hero_name": "npc_dota_hero_obsidian_destroyer",
+    "hero_name_cn": "殁境神蚀者",
+    "hero_name_cn2": "黑鸟"
+  },
+  {
+    "hero_id": 82,
+    "hero_name_en1": "Meepo",
+    "hero_name_en2": "Meepo",
+    "hero_name": "npc_dota_hero_meepo",
+    "hero_name_cn": "米波",
+    "hero_name_cn2": "米波"
+  },
+  {
+    "hero_id": 84,
+    "hero_name_en1": "Ogre_Magi",
+    "hero_name_en2": "Ogre Magi",
+    "hero_name": "npc_dota_hero_ogre_magi",
+    "hero_name_cn": "食人魔魔法师",
+    "hero_name_cn2": "蓝胖"
+  },
+  {
+    "hero_id": 88,
+    "hero_name_en1": "Nyx_Assassin",
+    "hero_name_en2": "Nyx Assassin",
+    "hero_name": "npc_dota_hero_nyx_assassin",
+    "hero_name_cn": "司夜刺客",
+    "hero_name_cn2": "小强"
+  },
+  {
+    "hero_id": 94,
+    "hero_name_en1": "Medusa",
+    "hero_name_en2": "Medusa",
+    "hero_name": "npc_dota_hero_medusa",
+    "hero_name_cn": "美杜莎",
+    "hero_name_cn2": "美杜莎"
+  },
+  {
+    "hero_id": 99,
+    "hero_name_en1": "Bristleback",
+    "hero_name_en2": "Bristleback",
+    "hero_name": "npc_dota_hero_bristleback",
+    "hero_name_cn": "钢背兽",
+    "hero_name_cn2": "钢背"
+  },
+  {
+    "hero_id": 101,
+    "hero_name_en1": "Skywrath_Mage",
+    "hero_name_en2": "Skywrath Mage",
+    "hero_name": "npc_dota_hero_skywrath_mage",
+    "hero_name_cn": "天怒法师",
+    "hero_name_cn2": "天怒"
+  },
+  {
+    "hero_id": 105,
+    "hero_name_en1": "Techies",
+    "hero_name_en2": "Techies",
+    "hero_name": "npc_dota_hero_techies",
+    "hero_name_cn": "工程师",
+    "hero_name_cn2": "炸弹人"
+  },
+  {
+    "hero_id": 111,
+    "hero_name_en1": "Oracle",
+    "hero_name_en2": "Oracle",
+    "hero_name": "npc_dota_hero_oracle",
+    "hero_name_cn": "神谕者",
+    "hero_name_cn2": "神谕"
+  },
+  {
+    "hero_id": 113,
+    "hero_name_en1": "ArcWarden",
+    "hero_name_en2": "Arc Warden",
+    "hero_name": "npc_dota_hero_arc_warden",
+    "hero_name_cn": "天穹守望者",
+    "hero_name_cn2": "电狗"
+  },
+  {
+    "hero_id": 119,
+    "hero_name_en1": "DarkWillow",
+    "hero_name_en2": "Dark Willow",
+    "hero_name": "npc_dota_hero_dark_willow",
+    "hero_name_cn": "邪影芳灵",
+    "hero_name_cn2": "花仙"
+  },
+  {
+    "hero_id": 123,
+    "hero_name_en1": "Hoodwink",
+    "hero_name_en2": "Hoodwink",
+    "hero_name": "npc_dota_hero_hoodwink",
+    "hero_name_cn": "森海飞霞",
+    "hero_name_cn2": "松鼠"
+  },
+  {
+    "hero_id": 131,
+    "hero_name_en1": "Ringmaster",
+    "hero_name_en2": "Ringmaster",
+    "hero_name": "npc_dota_hero_ringmaster",
+    "hero_name_cn": "百戏大王",
+    "hero_name_cn2": "百戏"
+  },
+  {
+    "hero_id": 137,
+    "hero_name_en1": "PrimalBeast",
+    "hero_name_en2": "Primal Beast",
+    "hero_name": "npc_dota_hero_primal_beast",
+    "hero_name_cn": "獣",
+    "hero_name_cn2": "大兽"
+  },
+  {
+    "hero_id": 145,
+    "hero_name_en1": "Kez",
+    "hero_name_en2": "Kez",
+    "hero_name": "npc_dota_hero_kez",
+    "hero_name_cn": "凯",
+    "hero_name_cn2": "凯"
+  },
+  {
+    "hero_id": 155,
+    "hero_name_en1": "Largo",
+    "hero_name_en2": "Largo",
+    "hero_name": "npc_dota_hero_largo",
+    "hero_name_cn": "朗戈",
+    "hero_name_cn2": "朗戈"
+  },
+  {
+    "hero_id": 2,
+    "hero_name_en1": "Axe",
+    "hero_name_en2": "Axe",
+    "hero_name": "npc_dota_hero_axe",
+    "hero_name_cn": "斧王",
+    "hero_name_cn2": "斧王"
+  },
+  {
+    "hero_id": 4,
+    "hero_name_en1": "Bloodseeker",
+    "hero_name_en2": "Bloodseeker",
+    "hero_name": "npc_dota_hero_bloodseeker",
+    "hero_name_cn": "血魔",
+    "hero_name_cn2": "血魔"
+  },
+  {
+    "hero_id": 8,
+    "hero_name_en1": "Juggernaut",
+    "hero_name_en2": "Juggernaut",
+    "hero_name": "npc_dota_hero_juggernaut",
+    "hero_name_cn": "主宰",
+    "hero_name_cn2": "剑圣"
+  },
+  {
+    "hero_id": 14,
+    "hero_name_en1": "Pudge",
+    "hero_name_en2": "Pudge",
+    "hero_name": "npc_dota_hero_pudge",
+    "hero_name_cn": "帕吉",
+    "hero_name_cn2": "屠夫"
+  },
+  {
+    "hero_id": 16,
+    "hero_name_en1": "SandKing",
+    "hero_name_en2": "Sand King",
+    "hero_name": "npc_dota_hero_sand_king",
+    "hero_name_cn": "沙王",
+    "hero_name_cn2": "沙王"
+  },
+  {
+    "hero_id": 22,
+    "hero_name_en1": "Zuus",
+    "hero_name_en2": "Zeus",
+    "hero_name": "npc_dota_hero_zuus",
+    "hero_name_cn": "宙斯",
+    "hero_name_cn2": "宙斯"
+  },
+  {
+    "hero_id": 26,
+    "hero_name_en1": "Lion",
+    "hero_name_en2": "Lion",
+    "hero_name": "npc_dota_hero_lion",
+    "hero_name_cn": "莱恩",
+    "hero_name_cn2": "莱恩"
+  },
+  {
+    "hero_id": 28,
+    "hero_name_en1": "Slardar",
+    "hero_name_en2": "Slardar",
+    "hero_name": "npc_dota_hero_slardar",
+    "hero_name_cn": "斯拉达",
+    "hero_name_cn2": "大鱼"
+  },
+  {
+    "hero_id": 33,
+    "hero_name_en1": "Enigma",
+    "hero_name_en2": "Enigma",
+    "hero_name": "npc_dota_hero_enigma",
+    "hero_name_cn": "谜团",
+    "hero_name_cn2": "谜团"
+  },
+  {
+    "hero_id": 39,
+    "hero_name_en1": "QueenOfPain",
+    "hero_name_en2": "Queen of Pain",
+    "hero_name": "npc_dota_hero_queenofpain",
+    "hero_name_cn": "痛苦女王",
+    "hero_name_cn2": "女王"
+  },
+  {
+    "hero_id": 43,
+    "hero_name_en1": "DeathProphet",
+    "hero_name_en2": "Death Prophet",
+    "hero_name": "npc_dota_hero_death_prophet",
+    "hero_name_cn": "死亡先知",
+    "hero_name_cn2": "DP"
+  },
+  {
+    "hero_id": 45,
+    "hero_name_en1": "Pugna",
+    "hero_name_en2": "Pugna",
+    "hero_name": "npc_dota_hero_pugna",
+    "hero_name_cn": "帕格纳",
+    "hero_name_cn2": "骨法"
+  },
+  {
+    "hero_id": 51,
+    "hero_name_en1": "Rattletrap",
+    "hero_name_en2": "Clockwerk",
+    "hero_name": "npc_dota_hero_rattletrap",
+    "hero_name_cn": "发条技师",
+    "hero_name_cn2": "发条"
+  },
+  {
+    "hero_id": 53,
+    "hero_name_en1": "Furion",
+    "hero_name_en2": "Nature's Prophet",
+    "hero_name": "npc_dota_hero_furion",
+    "hero_name_cn": "先知",
+    "hero_name_cn2": "先知"
+  },
+  {
+    "hero_id": 57,
+    "hero_name_en1": "Omniknight",
+    "hero_name_en2": "Omniknight",
+    "hero_name": "npc_dota_hero_omniknight",
+    "hero_name_cn": "全能骑士",
+    "hero_name_cn2": "全能"
+  },
+  {
+    "hero_id": 63,
+    "hero_name_en1": "Weaver",
+    "hero_name_en2": "Weaver",
+    "hero_name": "npc_dota_hero_weaver",
+    "hero_name_cn": "编织者",
+    "hero_name_cn2": "蚂蚁"
+  },
+  {
+    "hero_id": 67,
+    "hero_name_en1": "Spectre",
+    "hero_name_en2": "Spectre",
+    "hero_name": "npc_dota_hero_spectre",
+    "hero_name_cn": "幽鬼",
+    "hero_name_cn2": "幽鬼"
+  },
+  {
+    "hero_id": 69,
+    "hero_name_en1": "DoomBringer",
+    "hero_name_en2": "Doom",
+    "hero_name": "npc_dota_hero_doom_bringer",
+    "hero_name_cn": "末日使者",
+    "hero_name_cn2": "末日"
+  },
+  {
+    "hero_id": 73,
+    "hero_name_en1": "Alchemist",
+    "hero_name_en2": "Alchemist",
+    "hero_name": "npc_dota_hero_alchemist",
+    "hero_name_cn": "炼金术士",
+    "hero_name_cn2": "炼金"
+  },
+  {
+    "hero_id": 79,
+    "hero_name_en1": "Shadow_Demon",
+    "hero_name_en2": "Shadow Demon",
+    "hero_name": "npc_dota_hero_shadow_demon",
+    "hero_name_cn": "暗影恶魔",
+    "hero_name_cn2": "毒狗"
+  },
+  {
+    "hero_id": 81,
+    "hero_name_en1": "ChaosKnight",
+    "hero_name_en2": "Chaos Knight",
+    "hero_name": "npc_dota_hero_chaos_knight",
+    "hero_name_cn": "混沌骑士",
+    "hero_name_cn2": "CK"
+  },
+  {
+    "hero_id": 87,
+    "hero_name_en1": "Disruptor",
+    "hero_name_en2": "Disruptor",
+    "hero_name": "npc_dota_hero_disruptor",
+    "hero_name_cn": "干扰者",
+    "hero_name_cn2": "萨尔"
+  },
+  {
+    "hero_id": 91,
+    "hero_name_en1": "Wisp",
+    "hero_name_en2": "Io",
+    "hero_name": "npc_dota_hero_wisp",
+    "hero_name_cn": "艾欧",
+    "hero_name_cn2": "精灵"
+  },
+  {
+    "hero_id": 93,
+    "hero_name_en1": "Slark",
+    "hero_name_en2": "Slark",
+    "hero_name": "npc_dota_hero_slark",
+    "hero_name_cn": "斯拉克",
+    "hero_name_cn2": "小鱼"
+  },
+  {
+    "hero_id": 96,
+    "hero_name_en1": "Centaur",
+    "hero_name_en2": "Centaur Warrunner",
+    "hero_name": "npc_dota_hero_centaur",
+    "hero_name_cn": "半人马战行者",
+    "hero_name_cn2": "人马"
+  },
+  {
+    "hero_id": 102,
+    "hero_name_en1": "Abaddon",
+    "hero_name_en2": "Abaddon",
+    "hero_name": "npc_dota_hero_abaddon",
+    "hero_name_cn": "亚巴顿",
+    "hero_name_cn2": "亚巴顿"
+  },
+  {
+    "hero_id": 106,
+    "hero_name_en1": "EmberSpirit",
+    "hero_name_en2": "Ember Spirit",
+    "hero_name": "npc_dota_hero_ember_spirit",
+    "hero_name_cn": "灰烬之灵",
+    "hero_name_cn2": "火猫"
+  },
+  {
+    "hero_id": 108,
+    "hero_name_en1": "AbyssalUnderlord",
+    "hero_name_en2": "Underlord",
+    "hero_name": "npc_dota_hero_abyssal_underlord",
+    "hero_name_cn": "孽主",
+    "hero_name_cn2": "孽主"
+  },
+  {
+    "hero_id": 114,
+    "hero_name_en1": "MonkeyKing",
+    "hero_name_en2": "Monkey King",
+    "hero_name": "npc_dota_hero_monkey_king",
+    "hero_name_cn": "齐天大圣",
+    "hero_name_cn2": "大圣"
+  },
+  {
+    "hero_id": 120,
+    "hero_name_en1": "Pangolier",
+    "hero_name_en2": "Pangolier",
+    "hero_name": "npc_dota_hero_pangolier",
+    "hero_name_cn": "石鳞剑士",
+    "hero_name_cn2": "滚滚"
+  },
+  {
+    "hero_id": 126,
+    "hero_name_en1": "Void_Spirit",
+    "hero_name_en2": "Void Spirit",
+    "hero_name": "npc_dota_hero_void_spirit",
+    "hero_name_cn": "虚无之灵",
+    "hero_name_cn2": "紫猫"
+  },
+  {
+    "hero_id": 128,
+    "hero_name_en1": "Snapfire",
+    "hero_name_en2": "Snapfire",
+    "hero_name": "npc_dota_hero_snapfire",
+    "hero_name_cn": "电炎绝手",
+    "hero_name_cn2": "老奶奶"
+  },
+  {
+    "hero_id": 138,
+    "hero_name_en1": "Muerta",
+    "hero_name_en2": "Muerta",
+    "hero_name": "npc_dota_hero_muerta",
+    "hero_name_cn": "琼英碧灵",
+    "hero_name_cn2": "奶绿"
+  },
+  {
+    "hero_id": 3,
+    "hero_name_en1": "Bane",
+    "hero_name_en2": "Bane",
+    "hero_name": "npc_dota_hero_bane",
+    "hero_name_cn": "祸乱之源",
+    "hero_name_cn2": "bane"
+  },
+  {
+    "hero_id": 5,
+    "hero_name_en1": "CrystalMaiden",
+    "hero_name_en2": "Crystal Maiden",
+    "hero_name": "npc_dota_hero_crystal_maiden",
+    "hero_name_cn": "水晶室女",
+    "hero_name_cn2": "冰女"
+  },
+  {
+    "hero_id": 9,
+    "hero_name_en1": "Mirana",
+    "hero_name_en2": "Mirana",
+    "hero_name": "npc_dota_hero_mirana",
+    "hero_name_cn": "米拉娜",
+    "hero_name_cn2": "白虎"
+  },
+  {
+    "hero_id": 15,
+    "hero_name_en1": "Razor",
+    "hero_name_en2": "Razor",
+    "hero_name": "npc_dota_hero_razor",
+    "hero_name_cn": "剃刀",
+    "hero_name_cn2": "电魂"
+  },
+  {
+    "hero_id": 17,
+    "hero_name_en1": "StormSpirit",
+    "hero_name_en2": "Storm Spirit",
+    "hero_name": "npc_dota_hero_storm_spirit",
+    "hero_name_cn": "风暴之灵",
+    "hero_name_cn2": "蓝猫"
+  },
+  {
+    "hero_id": 23,
+    "hero_name_en1": "Kunkka",
+    "hero_name_en2": "Kunkka",
+    "hero_name": "npc_dota_hero_kunkka",
+    "hero_name_cn": "昆卡",
+    "hero_name_cn2": "船长"
+  },
+  {
+    "hero_id": 27,
+    "hero_name_en1": "ShadowShaman",
+    "hero_name_en2": "Shadow Shaman",
+    "hero_name": "npc_dota_hero_shadow_shaman",
+    "hero_name_cn": "暗影萨满",
+    "hero_name_cn2": "小Y"
+  },
+  {
+    "hero_id": 29,
+    "hero_name_en1": "Tidehunter",
+    "hero_name_en2": "Tidehunter",
+    "hero_name": "npc_dota_hero_tidehunter",
+    "hero_name_cn": "潮汐猎人",
+    "hero_name_cn2": "潮汐"
+  },
+  {
+    "hero_id": 32,
+    "hero_name_en1": "Riki",
+    "hero_name_en2": "Riki",
+    "hero_name": "npc_dota_hero_riki",
+    "hero_name_cn": "力丸",
+    "hero_name_cn2": "隐刺"
+  },
+  {
+    "hero_id": 38,
+    "hero_name_en1": "Beastmaster",
+    "hero_name_en2": "Beastmaster",
+    "hero_name": "npc_dota_hero_beastmaster",
+    "hero_name_cn": "兽王",
+    "hero_name_cn2": "兽王"
+  },
+  {
+    "hero_id": 42,
+    "hero_name_en1": "SkeletonKing",
+    "hero_name_en2": "Wraith King",
+    "hero_name": "npc_dota_hero_skeleton_king",
+    "hero_name_cn": "冥魂大帝",
+    "hero_name_cn2": "骷髅王"
+  },
+  {
+    "hero_id": 44,
+    "hero_name_en1": "PhantomAssassin",
+    "hero_name_en2": "Phantom Assassin",
+    "hero_name": "npc_dota_hero_phantom_assassin",
+    "hero_name_cn": "幻影刺客",
+    "hero_name_cn2": "PA"
+  },
+  {
+    "hero_id": 50,
+    "hero_name_en1": "Dazzle",
+    "hero_name_en2": "Dazzle",
+    "hero_name": "npc_dota_hero_dazzle",
+    "hero_name_cn": "戴泽",
+    "hero_name_cn2": "戴泽"
+  },
+  {
+    "hero_id": 52,
+    "hero_name_en1": "Leshrac",
+    "hero_name_en2": "Leshrac",
+    "hero_name": "npc_dota_hero_leshrac",
+    "hero_name_cn": "拉席克",
+    "hero_name_cn2": "老鹿"
+  },
+  {
+    "hero_id": 56,
+    "hero_name_en1": "Clinkz",
+    "hero_name_en2": "Clinkz",
+    "hero_name": "npc_dota_hero_clinkz",
+    "hero_name_cn": "克林克兹",
+    "hero_name_cn2": "小骷髅"
+  },
+  {
+    "hero_id": 62,
+    "hero_name_en1": "BountyHunter",
+    "hero_name_en2": "Bounty Hunter",
+    "hero_name": "npc_dota_hero_bounty_hunter",
+    "hero_name_cn": "赏金猎人",
+    "hero_name_cn2": "赏金"
+  },
+  {
+    "hero_id": 66,
+    "hero_name_en1": "Chen",
+    "hero_name_en2": "Chen",
+    "hero_name": "npc_dota_hero_chen",
+    "hero_name_cn": "陈",
+    "hero_name_cn2": "陈"
+  },
+  {
+    "hero_id": 68,
+    "hero_name_en1": "AncientApparition",
+    "hero_name_en2": "Ancient Apparition",
+    "hero_name": "npc_dota_hero_ancient_apparition",
+    "hero_name_cn": "远古冰魄",
+    "hero_name_cn2": "冰魂"
+  },
+  {
+    "hero_id": 72,
+    "hero_name_en1": "Gyrocopter",
+    "hero_name_en2": "Gyrocopter",
+    "hero_name": "npc_dota_hero_gyrocopter",
+    "hero_name_cn": "矮人直升机",
+    "hero_name_cn2": "飞机"
+  },
+  {
+    "hero_id": 78,
+    "hero_name_en1": "Brewmaster",
+    "hero_name_en2": "Brewmaster",
+    "hero_name": "npc_dota_hero_brewmaster",
+    "hero_name_cn": "酒仙",
+    "hero_name_cn2": "酒仙"
+  },
+  {
+    "hero_id": 80,
+    "hero_name_en1": "LoneDruid",
+    "hero_name_en2": "Lone Druid",
+    "hero_name": "npc_dota_hero_lone_druid",
+    "hero_name_cn": "德鲁伊",
+    "hero_name_cn2": "德鲁伊"
+  },
+  {
+    "hero_id": 86,
+    "hero_name_en1": "Rubick",
+    "hero_name_en2": "Rubick",
+    "hero_name": "npc_dota_hero_rubick",
+    "hero_name_cn": "拉比克",
+    "hero_name_cn2": "拉比克"
+  },
+  {
+    "hero_id": 90,
+    "hero_name_en1": "KeeperOfTheLight",
+    "hero_name_en2": "Keeper of the Light",
+    "hero_name": "npc_dota_hero_keeper_of_the_light",
+    "hero_name_cn": "光之守卫",
+    "hero_name_cn2": "光法"
+  },
+  {
+    "hero_id": 92,
+    "hero_name_en1": "Visage",
+    "hero_name_en2": "Visage",
+    "hero_name": "npc_dota_hero_visage",
+    "hero_name_cn": "维萨吉",
+    "hero_name_cn2": "维萨吉"
+  },
+  {
+    "hero_id": 97,
+    "hero_name_en1": "Magnataur",
+    "hero_name_en2": "Magnus",
+    "hero_name": "npc_dota_hero_magnataur",
+    "hero_name_cn": "马格纳斯",
+    "hero_name_cn2": "猛犸"
+  },
+  {
+    "hero_id": 103,
+    "hero_name_en1": "Elder_Titan",
+    "hero_name_en2": "Elder Titan",
+    "hero_name": "npc_dota_hero_elder_titan",
+    "hero_name_cn": "上古巨神",
+    "hero_name_cn2": "大牛"
+  },
+  {
+    "hero_id": 107,
+    "hero_name_en1": "EarthSpirit",
+    "hero_name_en2": "Earth Spirit",
+    "hero_name": "npc_dota_hero_earth_spirit",
+    "hero_name_cn": "大地之灵",
+    "hero_name_cn2": "土猫"
+  },
+  {
+    "hero_id": 109,
+    "hero_name_en1": "Terrorblade",
+    "hero_name_en2": "Terrorblade",
+    "hero_name": "npc_dota_hero_terrorblade",
+    "hero_name_cn": "恐怖利刃",
+    "hero_name_cn2": "TB"
+  },
+  {
+    "hero_id": 121,
+    "hero_name_en1": "Grimstroke",
+    "hero_name_en2": "Grimstroke",
+    "hero_name": "npc_dota_hero_grimstroke",
+    "hero_name_cn": "天涯墨客",
+    "hero_name_cn2": "墨客"
+  },
+  {
+    "hero_id": 129,
+    "hero_name_en1": "Mars",
+    "hero_name_en2": "Mars",
+    "hero_name": "npc_dota_hero_mars",
+    "hero_name_cn": "玛尔斯",
+    "hero_name_cn2": "马尔斯"
+  },
+  {
+    "hero_id": 135,
+    "hero_name_en1": "Dawnbreaker",
+    "hero_name_en2": "Dawnbreaker",
+    "hero_name": "npc_dota_hero_dawnbreaker",
+    "hero_name_cn": "破晓辰星",
+    "hero_name_cn2": "大锤"
+  }
+]

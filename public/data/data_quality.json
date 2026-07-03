@@ -1,0 +1,430 @@
+{
+  "patch_version": "7.41",
+  "calculation_version": "dota-741-hero-meta-v1",
+  "totals": {
+    "matches": 934,
+    "bp_matches": 930,
+    "player_matches": 934,
+    "confirmed_position_matches": 382,
+    "raw_position_matches": 934,
+    "issue_count": 54
+  },
+  "event_match_counts": {
+    "BLAST SLAM VII": 102,
+    "DreamLeague Season 29": 185,
+    "ESL One Birmingham 2026": 78,
+    "EWC 2026 Regional Qualifiers": 262,
+    "PGL Wallachia 2026 Season 8": 119,
+    "TI 2026 Regional Qualifiers": 188
+  },
+  "event_quality": [
+    {
+      "event_group": "BLAST SLAM VII",
+      "match_count": 102,
+      "bp_complete_matches": 102,
+      "player_complete_matches": 102,
+      "confirmed_position_complete_matches": 0,
+      "raw_position_complete_matches": 102,
+      "issue_count": 0,
+      "bp_complete_rate": 1.0,
+      "player_complete_rate": 1.0,
+      "confirmed_position_complete_rate": 0.0,
+      "raw_position_complete_rate": 1.0
+    },
+    {
+      "event_group": "DreamLeague Season 29",
+      "match_count": 185,
+      "bp_complete_matches": 184,
+      "player_complete_matches": 185,
+      "confirmed_position_complete_matches": 185,
+      "raw_position_complete_matches": 185,
+      "issue_count": 1,
+      "bp_complete_rate": 0.9946,
+      "player_complete_rate": 1.0,
+      "confirmed_position_complete_rate": 1.0,
+      "raw_position_complete_rate": 1.0
+    },
+    {
+      "event_group": "ESL One Birmingham 2026",
+      "match_count": 78,
+      "bp_complete_matches": 78,
+      "player_complete_matches": 78,
+      "confirmed_position_complete_matches": 78,
+      "raw_position_complete_matches": 78,
+      "issue_count": 0,
+      "bp_complete_rate": 1.0,
+      "player_complete_rate": 1.0,
+      "confirmed_position_complete_rate": 1.0,
+      "raw_position_complete_rate": 1.0
+    },
+    {
+      "event_group": "EWC 2026 Regional Qualifiers",
+      "match_count": 262,
+      "bp_complete_matches": 259,
+      "player_complete_matches": 262,
+      "confirmed_position_complete_matches": 0,
+      "raw_position_complete_matches": 262,
+      "issue_count": 3,
+      "bp_complete_rate": 0.9885,
+      "player_complete_rate": 1.0,
+      "confirmed_position_complete_rate": 0.0,
+      "raw_position_complete_rate": 1.0
+    },
+    {
+      "event_group": "PGL Wallachia 2026 Season 8",
+      "match_count": 119,
+      "bp_complete_matches": 119,
+      "player_complete_matches": 119,
+      "confirmed_position_complete_matches": 119,
+      "raw_position_complete_matches": 119,
+      "issue_count": 0,
+      "bp_complete_rate": 1.0,
+      "player_complete_rate": 1.0,
+      "confirmed_position_complete_rate": 1.0,
+      "raw_position_complete_rate": 1.0
+    },
+    {
+      "event_group": "TI 2026 Regional Qualifiers",
+      "match_count": 188,
+      "bp_complete_matches": 163,
+      "player_complete_matches": 163,
+      "confirmed_position_complete_matches": 0,
+      "raw_position_complete_matches": 188,
+      "issue_count": 50,
+      "bp_complete_rate": 0.867,
+      "player_complete_rate": 0.867,
+      "confirmed_position_complete_rate": 0.0,
+      "raw_position_complete_rate": 1.0
+    }
+  ],
+  "issue_summary": {
+    "bp_row_count_not_24": 29,
+    "player_row_count_not_10": 25
+  },
+  "issues": [
+    {
+      "match_id": 8813802531,
+      "issue_type": "bp_row_count_not_24",
+      "actual": 0,
+      "expected": 24
+    },
+    {
+      "match_id": 8832812545,
+      "issue_type": "bp_row_count_not_24",
+      "actual": 0,
+      "expected": 24
+    },
+    {
+      "match_id": 8833354742,
+      "issue_type": "bp_row_count_not_24",
+      "actual": 23,
+      "expected": 24
+    },
+    {
+      "match_id": 8836546827,
+      "issue_type": "bp_row_count_not_24",
+      "actual": 0,
+      "expected": 24
+    },
+    {
+      "match_id": 8865077196,
+      "issue_type": "bp_row_count_not_24",
+      "actual": 48,
+      "expected": 24
+    },
+    {
+      "match_id": 8865077196,
+      "issue_type": "player_row_count_not_10",
+      "actual": 20,
+      "expected": 10
+    },
+    {
+      "match_id": 8865148834,
+      "issue_type": "bp_row_count_not_24",
+      "actual": 48,
+      "expected": 24
+    },
+    {
+      "match_id": 8865148834,
+      "issue_type": "player_row_count_not_10",
+      "actual": 20,
+      "expected": 10
+    },
+    {
+      "match_id": 8865201396,
+      "issue_type": "bp_row_count_not_24",
+      "actual": 48,
+      "expected": 24
+    },
+    {
+      "match_id": 8865201396,
+      "issue_type": "player_row_count_not_10",
+      "actual": 20,
+      "expected": 10
+    },
+    {
+      "match_id": 8865235987,
+      "issue_type": "bp_row_count_not_24",
+      "actual": 48,
+      "expected": 24
+    },
+    {
+      "match_id": 8865235987,
+      "issue_type": "player_row_count_not_10",
+      "actual": 20,
+      "expected": 10
+    },
+    {
+      "match_id": 8866367033,
+      "issue_type": "bp_row_count_not_24",
+      "actual": 48,
+      "expected": 24
+    },
+    {
+      "match_id": 8866367033,
+      "issue_type": "player_row_count_not_10",
+      "actual": 20,
+      "expected": 10
+    },
+    {
+      "match_id": 8866547078,
+      "issue_type": "bp_row_count_not_24",
+      "actual": 0,
+      "expected": 24
+    },
+    {
+      "match_id": 8866547078,
+      "issue_type": "player_row_count_not_10",
+      "actual": 20,
+      "expected": 10
+    },
+    {
+      "match_id": 8866565136,
+      "issue_type": "bp_row_count_not_24",
+      "actual": 48,
+      "expected": 24
+    },
+    {
+      "match_id": 8866565136,
+      "issue_type": "player_row_count_not_10",
+      "actual": 20,
+      "expected": 10
+    },
+    {
+      "match_id": 8866595719,
+      "issue_type": "bp_row_count_not_24",
+      "actual": 48,
+      "expected": 24
+    },
+    {
+      "match_id": 8866595719,
+      "issue_type": "player_row_count_not_10",
+      "actual": 20,
+      "expected": 10
+    },
+    {
+      "match_id": 8867981437,
+      "issue_type": "bp_row_count_not_24",
+      "actual": 48,
+      "expected": 24
+    },
+    {
+      "match_id": 8867981437,
+      "issue_type": "player_row_count_not_10",
+      "actual": 20,
+      "expected": 10
+    },
+    {
+      "match_id": 8868075845,
+      "issue_type": "bp_row_count_not_24",
+      "actual": 48,
+      "expected": 24
+    },
+    {
+      "match_id": 8868075845,
+      "issue_type": "player_row_count_not_10",
+      "actual": 20,
+      "expected": 10
+    },
+    {
+      "match_id": 8868198692,
+      "issue_type": "bp_row_count_not_24",
+      "actual": 48,
+      "expected": 24
+    },
+    {
+      "match_id": 8868198692,
+      "issue_type": "player_row_count_not_10",
+      "actual": 20,
+      "expected": 10
+    },
+    {
+      "match_id": 8868259993,
+      "issue_type": "bp_row_count_not_24",
+      "actual": 48,
+      "expected": 24
+    },
+    {
+      "match_id": 8868259993,
+      "issue_type": "player_row_count_not_10",
+      "actual": 20,
+      "expected": 10
+    },
+    {
+      "match_id": 8868289953,
+      "issue_type": "bp_row_count_not_24",
+      "actual": 48,
+      "expected": 24
+    },
+    {
+      "match_id": 8868289953,
+      "issue_type": "player_row_count_not_10",
+      "actual": 20,
+      "expected": 10
+    },
+    {
+      "match_id": 8868891396,
+      "issue_type": "bp_row_count_not_24",
+      "actual": 48,
+      "expected": 24
+    },
+    {
+      "match_id": 8868891396,
+      "issue_type": "player_row_count_not_10",
+      "actual": 20,
+      "expected": 10
+    },
+    {
+      "match_id": 8869032515,
+      "issue_type": "bp_row_count_not_24",
+      "actual": 48,
+      "expected": 24
+    },
+    {
+      "match_id": 8869032515,
+      "issue_type": "player_row_count_not_10",
+      "actual": 20,
+      "expected": 10
+    },
+    {
+      "match_id": 8869138077,
+      "issue_type": "bp_row_count_not_24",
+      "actual": 48,
+      "expected": 24
+    },
+    {
+      "match_id": 8869138077,
+      "issue_type": "player_row_count_not_10",
+      "actual": 20,
+      "expected": 10
+    },
+    {
+      "match_id": 8869278302,
+      "issue_type": "bp_row_count_not_24",
+      "actual": 48,
+      "expected": 24
+    },
+    {
+      "match_id": 8869278302,
+      "issue_type": "player_row_count_not_10",
+      "actual": 20,
+      "expected": 10
+    },
+    {
+      "match_id": 8869425699,
+      "issue_type": "bp_row_count_not_24",
+      "actual": 48,
+      "expected": 24
+    },
+    {
+      "match_id": 8869425699,
+      "issue_type": "player_row_count_not_10",
+      "actual": 20,
+      "expected": 10
+    },
+    {
+      "match_id": 8869535334,
+      "issue_type": "bp_row_count_not_24",
+      "actual": 48,
+      "expected": 24
+    },
+    {
+      "match_id": 8869535334,
+      "issue_type": "player_row_count_not_10",
+      "actual": 20,
+      "expected": 10
+    },
+    {
+      "match_id": 8870805066,
+      "issue_type": "bp_row_count_not_24",
+      "actual": 48,
+      "expected": 24
+    },
+    {
+      "match_id": 8870805066,
+      "issue_type": "player_row_count_not_10",
+      "actual": 20,
+      "expected": 10
+    },
+    {
+      "match_id": 8870918906,
+      "issue_type": "bp_row_count_not_24",
+      "actual": 48,
+      "expected": 24
+    },
+    {
+      "match_id": 8870918906,
+      "issue_type": "player_row_count_not_10",
+      "actual": 20,
+      "expected": 10
+    },
+    {
+      "match_id": 8871085894,
+      "issue_type": "bp_row_count_not_24",
+      "actual": 48,
+      "expected": 24
+    },
+    {
+      "match_id": 8871085894,
+      "issue_type": "player_row_count_not_10",
+      "actual": 20,
+      "expected": 10
+    },
+    {
+      "match_id": 8871239788,
+      "issue_type": "bp_row_count_not_24",
+      "actual": 48,
+      "expected": 24
+    },
+    {
+      "match_id": 8871239788,
+      "issue_type": "player_row_count_not_10",
+      "actual": 20,
+      "expected": 10
+    },
+    {
+      "match_id": 8871409188,
+      "issue_type": "bp_row_count_not_24",
+      "actual": 48,
+      "expected": 24
+    },
+    {
+      "match_id": 8871409188,
+      "issue_type": "player_row_count_not_10",
+      "actual": 20,
+      "expected": 10
+    },
+    {
+      "match_id": 8871520485,
+      "issue_type": "bp_row_count_not_24",
+      "actual": 48,
+      "expected": 24
+    },
+    {
+      "match_id": 8871520485,
+      "issue_type": "player_row_count_not_10",
+      "actual": 20,
+      "expected": 10
+    }
+  ]
+}
