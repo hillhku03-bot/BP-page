@@ -55,13 +55,31 @@ const relationGroupLabels: Record<HeroRelationGroupKey, string> = {
   synergizes: "该英雄配合"
 };
 
+const heroDetailTabs: Array<{ key: HeroDetailTabKey; label: string }> = [
+  { key: "counters", label: "克制" },
+  { key: "synergies", label: "配合" },
+  { key: "heat", label: "近3个月热度" }
+];
+
 type HeroRelationGroupKey = "countered_by" | "counters" | "synergized_by" | "synergizes";
+type HeroDetailTabKey = "counters" | "synergies" | "heat";
 
 interface HeroRelationDetailItem {
   otherHeroId: number;
   groupKey: HeroRelationGroupKey;
   totalSample: number;
   detailTexts: string[];
+}
+
+interface HeroMovementRow extends HeroEventMetric {
+  delta: number;
+  baseline_event: string;
+}
+
+interface HeroRecentHeatRow extends HeroEventMetric {
+  delta: number | null;
+  previousEvent: string;
+  eventDate: string;
 }
 
 function pct(value: number | null | undefined, digits = 1) {
@@ -78,11 +96,37 @@ function heroName(hero?: Hero) {
     return "Unknown";
   }
   const cn = hero.hero_name_cn || hero.hero_name_cn2 || hero.hero_name;
-  const en = hero.hero_name_en1 || hero.hero_name_en2;
+  const en = hero.hero_name_en2 || hero.hero_name_en1;
   if (cn && en && cn !== en) {
     return `${cn} / ${en}`;
   }
   return cn || en || `Hero ${hero.hero_id}`;
+}
+
+function heroImageUrl(hero?: Hero) {
+  const prefix = "npc_dota_hero_";
+  if (!hero?.hero_name?.startsWith(prefix)) {
+    return "";
+  }
+  const slug = hero.hero_name.slice(prefix.length);
+  return `https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/${slug}.png`;
+}
+
+function orderedEvents(data: AppData) {
+  return [...data.events].sort((a, b) => a.first_match.localeCompare(b.first_match));
+}
+
+function latestEventDate(data: AppData) {
+  return orderedEvents(data).reduce((latest, event) => {
+    const candidate = new Date(event.last_match || event.first_match);
+    return Number.isFinite(candidate.getTime()) && candidate > latest ? candidate : latest;
+  }, new Date(0));
+}
+
+function threeMonthsBefore(date: Date) {
+  const result = new Date(date);
+  result.setMonth(result.getMonth() - 3);
+  return result;
 }
 
 function relationLabel(type: string) {
@@ -120,6 +164,7 @@ function useHeroTools(data: AppData | null) {
 
     const label = (heroId: number) => heroName(heroById.get(heroId));
     const primaryName = (heroId: number) => label(heroId).split(" / ")[0] || `Hero ${heroId}`;
+    const imageUrl = (heroId: number) => heroImageUrl(heroById.get(heroId));
     const searchHit = (heroId: number, query: string) => {
       const text = `${label(heroId)} ${heroId}`.toLowerCase();
       return text.includes(query.trim().toLowerCase());
@@ -132,7 +177,7 @@ function useHeroTools(data: AppData | null) {
         .join(" / ");
     };
 
-    return { label, primaryName, searchHit, positionSummary, positionByHeroEvent };
+    return { label, primaryName, imageUrl, searchHit, positionSummary, positionByHeroEvent };
   }, [data]);
 }
 
@@ -161,7 +206,7 @@ function metricPassesFilters(
 export function App() {
   const [data, setData] = useState<AppData | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<TabKey>("heroes");
+  const [activeTab, setActiveTab] = useState<TabKey>("movement");
   const [selectedHeroId, setSelectedHeroId] = useState<number | null>(null);
   const [filters, setFilters] = useState<AppFilters>(() =>
     typeof window === "undefined" ? defaultFilters : parseFilters(window.location.search)
@@ -268,7 +313,15 @@ export function App() {
             onSelectHero={setSelectedHeroId}
           />
         )}
-        {activeTab === "movement" && <MovementPanel data={data} filters={filters} tools={tools} />}
+        {activeTab === "movement" && (
+          <MovementPanel
+            data={data}
+            filters={filters}
+            tools={tools}
+            selectedHeroId={selectedHeroId}
+            onSelectHero={setSelectedHeroId}
+          />
+        )}
         {activeTab === "relations" && <RelationsPanel data={data} filters={filters} tools={tools} />}
         {activeTab === "bp_laning" && <BpLaningPanel data={data} filters={filters} tools={tools} />}
       </section>
@@ -479,6 +532,27 @@ function HeroRankingPanel({
   );
 }
 
+function HeroAvatar({ heroId, tools, large = false }: { heroId: number; tools: ReturnType<typeof useHeroTools>; large?: boolean }) {
+  const name = tools.primaryName(heroId);
+  const imageUrl = tools.imageUrl(heroId);
+  return (
+    <span className={large ? "hero-avatar large" : "hero-avatar"}>
+      {imageUrl && (
+        <img
+          alt={`${name}官方头像`}
+          src={imageUrl}
+          onError={(event) => {
+            event.currentTarget.style.display = "none";
+          }}
+        />
+      )}
+      <span className="hero-avatar-fallback" aria-hidden="true">
+        {name.slice(0, 1)}
+      </span>
+    </span>
+  );
+}
+
 function HeroAvatarButton({
   heroId,
   tools,
@@ -498,9 +572,7 @@ function HeroAvatarButton({
       onClick={onClick}
       type="button"
     >
-      <span className="hero-avatar" aria-hidden="true">
-        {name.slice(0, 1)}
-      </span>
+      <HeroAvatar heroId={heroId} tools={tools} />
       <span>{tools.label(heroId)}</span>
     </button>
   );
@@ -583,6 +655,102 @@ function buildHeroRelationDetailItems(
   return result;
 }
 
+function buildRecentHeatRows(heroId: number, data: AppData): HeroRecentHeatRow[] {
+  const eventOrder = orderedEvents(data);
+  const cutoff = threeMonthsBefore(latestEventDate(data));
+
+  return eventOrder
+    .map((event, index) => {
+      const metric = data.heroEventMetrics.find(
+        (row) => row.hero_id === heroId && row.event_group === event.event_group
+      );
+      if (!metric) {
+        return null;
+      }
+      const previousEvent = index > 0 ? eventOrder[index - 1].event_group : "";
+      const previousMetric = previousEvent
+        ? data.heroEventMetrics.find((row) => row.hero_id === heroId && row.event_group === previousEvent)
+        : undefined;
+      const eventDate = new Date(event.last_match || event.first_match);
+      if (!Number.isFinite(eventDate.getTime()) || eventDate < cutoff) {
+        return null;
+      }
+      return {
+        ...metric,
+        delta: previousMetric ? metric.heat_rate - previousMetric.heat_rate : null,
+        previousEvent: previousMetric ? previousEvent : "样本外",
+        eventDate: event.last_match || event.first_match
+      } satisfies HeroRecentHeatRow;
+    })
+    .filter((row): row is HeroRecentHeatRow => row !== null)
+    .sort((a, b) => b.eventDate.localeCompare(a.eventDate));
+}
+
+function HeroRelationGroupSection({
+  groupKey,
+  items,
+  tools
+}: {
+  groupKey: HeroRelationGroupKey;
+  items: HeroRelationDetailItem[];
+  tools: ReturnType<typeof useHeroTools>;
+}) {
+  return (
+    <section className="hero-relation-group">
+      <h4>{relationGroupLabels[groupKey]}</h4>
+      {items.length === 0 ? (
+        <p className="empty-note">当前筛选下无满足样本量的证据。</p>
+      ) : (
+        <div className="hero-relation-card-list">
+          {items.slice(0, 8).map((item) => (
+            <article className="hero-relation-card" key={`${groupKey}-${item.otherHeroId}`}>
+              <div className="hero-relation-card-title">
+                <HeroAvatar heroId={item.otherHeroId} tools={tools} />
+                <strong>{tools.label(item.otherHeroId)}</strong>
+                <b>{item.totalSample}</b>
+              </div>
+              <div className="evidence-chip-list">
+                {item.detailTexts.map((text) => (
+                  <span className="evidence-chip" key={text}>
+                    {text}
+                  </span>
+                ))}
+              </div>
+            </article>
+          ))}
+        </div>
+      )}
+    </section>
+  );
+}
+
+function RecentHeatPanel({ rows }: { rows: HeroRecentHeatRow[] }) {
+  return (
+    <section className="hero-relation-group hero-heat-group">
+      <h4>最近 3 个月热度变化</h4>
+      {rows.length === 0 ? (
+        <p className="empty-note">最近 3 个月暂无该英雄热度样本。</p>
+      ) : (
+        <div className="stack-list">
+          {rows.map((row) => (
+            <div className="rank-row" key={`${row.event_group}-${row.hero_id}-recent-heat`}>
+              <div>
+                <strong>{row.event_group}</strong>
+                <span>
+                  {row.previousEvent} → {row.event_group}
+                </span>
+              </div>
+              <div className={row.delta === null ? "delta" : row.delta >= 0 ? "delta up" : "delta down"}>
+                {pct(row.heat_rate)} · {row.delta === null ? "样本外" : signedPct(row.delta)}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </section>
+  );
+}
+
 function HeroRelationDetailPanel({
   heroId,
   data,
@@ -600,15 +768,14 @@ function HeroRelationDetailPanel({
     () => buildHeroRelationDetailItems(heroId, data.heroPairRelations, filters),
     [heroId, data.heroPairRelations, filters]
   );
-  const groupKeys: HeroRelationGroupKey[] = ["countered_by", "counters", "synergized_by", "synergizes"];
+  const recentHeatRows = useMemo(() => buildRecentHeatRows(heroId, data), [heroId, data]);
+  const [activeDetailTab, setActiveDetailTab] = useState<HeroDetailTabKey>("counters");
 
   return (
     <section className="hero-detail-panel" aria-label={`${tools.primaryName(heroId)}关系详情`}>
       <div className="hero-detail-header">
         <div className="hero-detail-title">
-          <span className="hero-avatar large" aria-hidden="true">
-            {tools.primaryName(heroId).slice(0, 1)}
-          </span>
+          <HeroAvatar heroId={heroId} tools={tools} large />
           <div>
             <h3>{tools.primaryName(heroId)}关系详情</h3>
             <p>{tools.label(heroId)}</p>
@@ -619,36 +786,35 @@ function HeroRelationDetailPanel({
         </button>
       </div>
 
-      <div className="hero-detail-groups">
-        {groupKeys.map((groupKey) => (
-          <section className="hero-relation-group" key={groupKey}>
-            <h4>{relationGroupLabels[groupKey]}</h4>
-            {groups[groupKey].length === 0 ? (
-              <p className="empty-note">当前筛选下无满足样本量的证据。</p>
-            ) : (
-              <div className="hero-relation-card-list">
-                {groups[groupKey].slice(0, 8).map((item) => (
-                  <article className="hero-relation-card" key={`${groupKey}-${item.otherHeroId}`}>
-                    <div className="hero-relation-card-title">
-                      <span className="hero-avatar" aria-hidden="true">
-                        {tools.primaryName(item.otherHeroId).slice(0, 1)}
-                      </span>
-                      <strong>{tools.label(item.otherHeroId)}</strong>
-                      <b>{item.totalSample}</b>
-                    </div>
-                    <div className="evidence-chip-list">
-                      {item.detailTexts.map((text) => (
-                        <span className="evidence-chip" key={text}>
-                          {text}
-                        </span>
-                      ))}
-                    </div>
-                  </article>
-                ))}
-              </div>
-            )}
-          </section>
+      <div className="hero-detail-tabs" role="tablist" aria-label={`${tools.primaryName(heroId)}详情标签`}>
+        {heroDetailTabs.map((tab) => (
+          <button
+            key={tab.key}
+            aria-selected={activeDetailTab === tab.key}
+            className={activeDetailTab === tab.key ? "detail-tab active" : "detail-tab"}
+            onClick={() => setActiveDetailTab(tab.key)}
+            role="tab"
+            type="button"
+          >
+            {tab.label}
+          </button>
         ))}
+      </div>
+
+      <div className="hero-detail-groups">
+        {activeDetailTab === "counters" && (
+          <>
+            <HeroRelationGroupSection groupKey="countered_by" items={groups.countered_by} tools={tools} />
+            <HeroRelationGroupSection groupKey="counters" items={groups.counters} tools={tools} />
+          </>
+        )}
+        {activeDetailTab === "synergies" && (
+          <>
+            <HeroRelationGroupSection groupKey="synergized_by" items={groups.synergized_by} tools={tools} />
+            <HeroRelationGroupSection groupKey="synergizes" items={groups.synergizes} tools={tools} />
+          </>
+        )}
+        {activeDetailTab === "heat" && <RecentHeatPanel rows={recentHeatRows} />}
       </div>
     </section>
   );
@@ -666,14 +832,18 @@ function BarValue({ value }: { value: number }) {
 function MovementPanel({
   data,
   filters,
-  tools
+  tools,
+  selectedHeroId,
+  onSelectHero
 }: {
   data: AppData;
   filters: AppFilters;
   tools: ReturnType<typeof useHeroTools>;
+  selectedHeroId: number | null;
+  onSelectHero: (heroId: number | null) => void;
 }) {
   const rows = useMemo(() => {
-    const eventOrder = [...data.events].sort((a, b) => a.first_match.localeCompare(b.first_match));
+    const eventOrder = orderedEvents(data);
     const targetEvent =
       filters.eventGroup === "all" ? eventOrder[eventOrder.length - 1]?.event_group : filters.eventGroup;
     const targetIndex = eventOrder.findIndex((event) => event.event_group === targetEvent);
@@ -695,11 +865,39 @@ function MovementPanel({
       .sort((a, b) => Math.abs(b.delta) - Math.abs(a.delta));
   }, [data, filters, tools]);
 
+  const risingRows = rows.filter((row) => row.delta >= 0).slice(0, 12);
+  const fallingRows = rows.filter((row) => row.delta < 0).slice(0, 12);
+
   return (
-    <section className="dual-grid">
-      <MovementList title="热度上升" icon={ArrowUpRight} rows={rows.filter((row) => row.delta >= 0).slice(0, 12)} tools={tools} />
-      <MovementList title="热度下降" icon={ArrowDownRight} rows={rows.filter((row) => row.delta < 0).slice(0, 12)} tools={tools} />
-    </section>
+    <>
+      <section className="dual-grid">
+        <MovementList
+          title={filters.baseline === "previous_event" ? "相邻赛事热度上升" : "热度上升"}
+          icon={ArrowUpRight}
+          rows={risingRows}
+          tools={tools}
+          selectedHeroId={selectedHeroId}
+          onSelectHero={onSelectHero}
+        />
+        <MovementList
+          title={filters.baseline === "previous_event" ? "相邻赛事热度下降" : "热度下降"}
+          icon={ArrowDownRight}
+          rows={fallingRows}
+          tools={tools}
+          selectedHeroId={selectedHeroId}
+          onSelectHero={onSelectHero}
+        />
+      </section>
+      {selectedHeroId !== null && (
+        <HeroRelationDetailPanel
+          heroId={selectedHeroId}
+          data={data}
+          filters={filters}
+          tools={tools}
+          onClose={() => onSelectHero(null)}
+        />
+      )}
+    </>
   );
 }
 
@@ -707,12 +905,16 @@ function MovementList({
   title,
   icon: Icon,
   rows,
-  tools
+  tools,
+  selectedHeroId,
+  onSelectHero
 }: {
   title: string;
   icon: typeof ArrowUpRight;
-  rows: Array<HeroEventMetric & { delta: number; baseline_event: string }>;
+  rows: HeroMovementRow[];
   tools: ReturnType<typeof useHeroTools>;
+  selectedHeroId: number | null;
+  onSelectHero: (heroId: number | null) => void;
 }) {
   return (
     <section className="panel">
@@ -727,8 +929,15 @@ function MovementList({
         {rows.map((row) => (
           <div className="rank-row" key={`${row.event_group}-${row.hero_id}-${title}`}>
             <div>
-              <strong>{tools.label(row.hero_id)}</strong>
-              <span>{row.event_group}</span>
+              <HeroAvatarButton
+                heroId={row.hero_id}
+                tools={tools}
+                selected={selectedHeroId === row.hero_id}
+                onClick={() => onSelectHero(selectedHeroId === row.hero_id ? null : row.hero_id)}
+              />
+              <span>
+                {row.baseline_event} → {row.event_group}
+              </span>
             </div>
             <div className={row.delta >= 0 ? "delta up" : "delta down"}>
               {pct(row.heat_rate)} · {signedPct(row.delta)}

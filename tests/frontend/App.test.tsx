@@ -3,12 +3,52 @@ import { afterEach, beforeEach, expect, test, vi } from "vitest";
 import { App } from "../../src/App";
 
 const fixtures: Record<string, unknown> = {
-  "/data/events.json": [{ event_group: "BLAST SLAM VII", match_count: 102, first_match: "2026-01-01", last_match: "2026-01-10" }],
+  "/data/events.json": [
+    { event_group: "ESL One Birmingham 2026", match_count: 78, first_match: "2026-03-24", last_match: "2026-03-30" },
+    { event_group: "DreamLeague Season 29", match_count: 185, first_match: "2026-05-13", last_match: "2026-05-25" },
+    { event_group: "BLAST SLAM VII", match_count: 102, first_match: "2026-06-01", last_match: "2026-06-10" }
+  ],
   "/data/heroes.json": [
-    { hero_id: 11, hero_name_en1: "Axe", hero_name_cn: "斧王" },
-    { hero_id: 12, hero_name_en1: "Phantom Lancer", hero_name_cn: "幻影长矛手" }
+    { hero_id: 11, hero_name_en1: "Axe", hero_name_en2: "Axe", hero_name: "npc_dota_hero_axe", hero_name_cn: "斧王" },
+    {
+      hero_id: 12,
+      hero_name_en1: "PhantomLancer",
+      hero_name_en2: "Phantom Lancer",
+      hero_name: "npc_dota_hero_phantom_lancer",
+      hero_name_cn: "幻影长矛手"
+    }
   ],
   "/data/hero_event_metrics.json": [
+    {
+      patch_version: "7.41",
+      event_group: "ESL One Birmingham 2026",
+      hero_id: 11,
+      match_count: 78,
+      pick_count: 5,
+      ban_count: 8,
+      first_ban: 2,
+      first_pick: 1,
+      heat_rate: 0.167,
+      pick_rate: 0.064,
+      ban_rate: 0.103,
+      win_rate: 0.4,
+      first_phase_contest_rate: 0.038
+    },
+    {
+      patch_version: "7.41",
+      event_group: "DreamLeague Season 29",
+      hero_id: 11,
+      match_count: 185,
+      pick_count: 20,
+      ban_count: 30,
+      first_ban: 10,
+      first_pick: 4,
+      heat_rate: 0.27,
+      pick_rate: 0.108,
+      ban_rate: 0.162,
+      win_rate: 0.55,
+      first_phase_contest_rate: 0.076
+    },
     {
       patch_version: "7.41",
       event_group: "BLAST SLAM VII",
@@ -23,6 +63,21 @@ const fixtures: Record<string, unknown> = {
       ban_rate: 0.196,
       win_rate: 0.6,
       first_phase_contest_rate: 0.098
+    },
+    {
+      patch_version: "7.41",
+      event_group: "BLAST SLAM VII",
+      hero_id: 12,
+      match_count: 102,
+      pick_count: 6,
+      ban_count: 8,
+      first_ban: 3,
+      first_pick: 2,
+      heat_rate: 0.137,
+      pick_rate: 0.059,
+      ban_rate: 0.078,
+      win_rate: 0.5,
+      first_phase_contest_rate: 0.049
     }
   ],
   "/data/hero_position_metrics.json": [
@@ -138,8 +193,28 @@ test("renders loaded dashboard data", async () => {
   render(<App />);
 
   expect(await screen.findByText("102 场")).toBeInTheDocument();
-  expect(screen.getByText(/斧王/)).toBeInTheDocument();
+  fireEvent.click(screen.getByRole("button", { name: "英雄热度" }));
+  expect(screen.getAllByText(/斧王/).length).toBeGreaterThan(0);
   expect(screen.getByText("29.4%")).toBeInTheDocument();
+});
+
+test("defaults to adjacent-event heat movement as the main meta view", async () => {
+  render(<App />);
+
+  expect(await screen.findByRole("button", { name: "热度变化" })).toHaveClass("active");
+  expect(screen.getByText("相邻赛事热度上升")).toBeInTheDocument();
+  expect(screen.getAllByText(/DreamLeague Season 29 → BLAST SLAM VII/).length).toBeGreaterThan(0);
+});
+
+test("renders official hero portrait from the npc hero key", async () => {
+  render(<App />);
+
+  fireEvent.click(await screen.findByRole("button", { name: "英雄热度" }));
+  const portraits = await screen.findAllByRole("img", { name: "斧王官方头像" });
+  const portrait = portraits[0];
+
+  expect(portrait).toHaveAttribute("src", expect.stringContaining("axe"));
+  expect(portrait).toHaveAttribute("src", expect.stringContaining("cdn.cloudflare.steamstatic.com"));
 });
 
 test("renders bp sequence evidence as its own relation section", async () => {
@@ -156,12 +231,20 @@ test("renders bp sequence evidence as its own relation section", async () => {
 test("opens hero relation details from hero avatar", async () => {
   render(<App />);
 
-  fireEvent.click(await screen.findByRole("button", { name: "查看斧王关系详情" }));
+  fireEvent.click(await screen.findByRole("button", { name: "英雄热度" }));
+  const axeButtons = await screen.findAllByRole("button", { name: "查看斧王关系详情" });
+  fireEvent.click(axeButtons[0]);
 
   expect(screen.getByText("斧王关系详情")).toBeInTheDocument();
+  expect(screen.getByRole("tab", { name: "克制" })).toBeInTheDocument();
+  expect(screen.getByRole("tab", { name: "配合" })).toBeInTheDocument();
+  expect(screen.getByRole("tab", { name: "近3个月热度" })).toBeInTheDocument();
   expect(screen.getByText("克制该英雄")).toBeInTheDocument();
   expect(screen.getAllByText(/幻影长矛手/).length).toBeGreaterThan(0);
   expect(screen.getByText("对位 4胜1负")).toBeInTheDocument();
-  expect(screen.getByText("先选后己方 Ban 6")).toBeInTheDocument();
+  fireEvent.click(screen.getByRole("tab", { name: "配合" }));
   expect(screen.getByText("同阵 5胜1负")).toBeInTheDocument();
+  fireEvent.click(screen.getByRole("tab", { name: "近3个月热度" }));
+  expect(screen.getByText("最近 3 个月热度变化")).toBeInTheDocument();
+  expect(screen.getByText(/DreamLeague Season 29 → BLAST SLAM VII/)).toBeInTheDocument();
 });

@@ -1,6 +1,7 @@
 node_modules/
 dist/
 .vite/
+work/
 .pytest_cache/
 __pycache__/
 *.py[cod]
