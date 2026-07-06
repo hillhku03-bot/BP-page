@@ -5,7 +5,7 @@
     "matches": 934,
     "bp_matches": 930,
     "player_matches": 934,
-    "confirmed_position_matches": 382,
+    "confirmed_position_matches": 826,
     "raw_position_matches": 934,
     "issue_count": 54
   },
@@ -23,12 +23,12 @@
       "match_count": 102,
       "bp_complete_matches": 102,
       "player_complete_matches": 102,
-      "confirmed_position_complete_matches": 0,
+      "confirmed_position_complete_matches": 95,
       "raw_position_complete_matches": 102,
       "issue_count": 0,
       "bp_complete_rate": 1.0,
       "player_complete_rate": 1.0,
-      "confirmed_position_complete_rate": 0.0,
+      "confirmed_position_complete_rate": 0.9314,
       "raw_position_complete_rate": 1.0
     },
     {
@@ -62,12 +62,12 @@
       "match_count": 262,
       "bp_complete_matches": 259,
       "player_complete_matches": 262,
-      "confirmed_position_complete_matches": 0,
+      "confirmed_position_complete_matches": 206,
       "raw_position_complete_matches": 262,
       "issue_count": 3,
       "bp_complete_rate": 0.9885,
       "player_complete_rate": 1.0,
-      "confirmed_position_complete_rate": 0.0,
+      "confirmed_position_complete_rate": 0.7863,
       "raw_position_complete_rate": 1.0
     },
     {
@@ -88,12 +88,12 @@
       "match_count": 188,
       "bp_complete_matches": 163,
       "player_complete_matches": 163,
-      "confirmed_position_complete_matches": 0,
+      "confirmed_position_complete_matches": 143,
       "raw_position_complete_matches": 188,
       "issue_count": 50,
       "bp_complete_rate": 0.867,
       "player_complete_rate": 0.867,
-      "confirmed_position_complete_rate": 0.0,
+      "confirmed_position_complete_rate": 0.7606,
       "raw_position_complete_rate": 1.0
     }
   ],

@@ -106,6 +106,36 @@ const fixtures: Record<string, unknown> = {
       ban_rate: 0.078,
       win_rate: 0.5,
       first_phase_contest_rate: 0.049
+    },
+    {
+      patch_version: "7.41",
+      event_group: "BLAST SLAM VII",
+      hero_id: 13,
+      match_count: 102,
+      pick_count: 4,
+      ban_count: 80,
+      first_ban: 30,
+      first_pick: 1,
+      heat_rate: 0.824,
+      pick_rate: 0.039,
+      ban_rate: 0.784,
+      win_rate: 0.5,
+      first_phase_contest_rate: 0.304
+    },
+    {
+      patch_version: "7.41",
+      event_group: "DreamLeague Season 29",
+      hero_id: 13,
+      match_count: 185,
+      pick_count: 5,
+      ban_count: 100,
+      first_ban: 50,
+      first_pick: 1,
+      heat_rate: 0.568,
+      pick_rate: 0.027,
+      ban_rate: 0.541,
+      win_rate: 0.5,
+      first_phase_contest_rate: 0.276
     }
   ],
   "/data/hero_position_metrics.json": [
@@ -136,6 +166,19 @@ const fixtures: Record<string, unknown> = {
     },
     {
       patch_version: "7.41",
+      event_group: "DreamLeague Season 29",
+      hero_a_id: 12,
+      hero_b_id: 11,
+      relation_type: "counter",
+      evidence_type: "vs_winrate_counter",
+      sample_size: 7,
+      wins: 5,
+      losses: 2,
+      rate: 0.714,
+      confidence_flag: "ok"
+    },
+    {
+      patch_version: "7.41",
       event_group: "BLAST SLAM VII",
       hero_a_id: 11,
       hero_b_id: 12,
@@ -145,6 +188,19 @@ const fixtures: Record<string, unknown> = {
       wins: 5,
       losses: 3,
       rate: 0.625,
+      confidence_flag: "ok"
+    },
+    {
+      patch_version: "7.41",
+      event_group: "DreamLeague Season 29",
+      hero_a_id: 11,
+      hero_b_id: 12,
+      relation_type: "synergy",
+      evidence_type: "same_side_winrate_synergy",
+      sample_size: 7,
+      wins: 5,
+      losses: 2,
+      rate: 0.714,
       confidence_flag: "ok"
     },
     {
@@ -262,13 +318,59 @@ const fixtures: Record<string, unknown> = {
     {
       patch_version: "7.41",
       event_group: "BLAST SLAM VII",
+      hero_a_id: 11,
+      hero_b_id: 13,
+      relation_type: "synergy",
+      evidence_type: "enemy_ban_after_a_synergy",
+      sample_size: 6,
+      rate: 1,
+      confidence_flag: "ok"
+    },
+    {
+      patch_version: "7.41",
+      event_group: "BLAST SLAM VII",
       hero_a_id: 13,
       hero_b_id: 11,
       relation_type: "counter",
       evidence_type: "vs_winrate_counter",
-      sample_size: 4,
-      wins: 4,
-      losses: 0,
+      sample_size: 10,
+      wins: 6,
+      losses: 4,
+      rate: 0.6,
+      confidence_flag: "ok"
+    },
+    {
+      patch_version: "7.41",
+      event_group: "BLAST SLAM VII",
+      hero_a_id: 11,
+      hero_b_id: 13,
+      relation_type: "counter",
+      evidence_type: "vs_winrate_counter",
+      sample_size: 10,
+      wins: 6,
+      losses: 4,
+      rate: 0.6,
+      confidence_flag: "ok"
+    },
+    {
+      patch_version: "7.41",
+      event_group: "BLAST SLAM VII",
+      hero_a_id: 15,
+      hero_b_id: 11,
+      relation_type: "counter",
+      evidence_type: "enemy_pick_after_a_counter",
+      sample_size: 5,
+      rate: 1,
+      confidence_flag: "ok"
+    },
+    {
+      patch_version: "7.41",
+      event_group: "BLAST SLAM VII",
+      hero_a_id: 16,
+      hero_b_id: 11,
+      relation_type: "counter",
+      evidence_type: "own_ban_after_a_counter",
+      sample_size: 6,
       rate: 1,
       confidence_flag: "ok"
     }
@@ -293,6 +395,7 @@ const fixtures: Record<string, unknown> = {
 };
 
 beforeEach(() => {
+  window.history.replaceState(null, "", "/");
   vi.stubGlobal(
     "fetch",
     vi.fn((path: string) =>
@@ -318,12 +421,14 @@ test("renders loaded dashboard data", async () => {
   expect(screen.getByText("29.4%")).toBeInTheDocument();
 });
 
-test("defaults to adjacent-event heat movement as the main meta view", async () => {
+test("defaults to earliest-to-latest heat movement as the main meta view", async () => {
   render(<App />);
 
   expect(await screen.findByRole("button", { name: "热度变化" })).toHaveClass("active");
-  expect(screen.getByText("相邻赛事热度上升")).toBeInTheDocument();
+  expect(screen.getByText("最早至最晚热度上升")).toBeInTheDocument();
   expect(screen.getAllByText(/DreamLeague Season 29 → BLAST SLAM VII/).length).toBeGreaterThan(0);
+  expect(screen.queryByText("斧王 / Axe")).not.toBeInTheDocument();
+  expect(screen.queryByText("变化基线")).not.toBeInTheDocument();
 });
 
 test("lets users compare any selected set of at least two events", async () => {
@@ -332,16 +437,60 @@ test("lets users compare any selected set of at least two events", async () => {
   expect(await screen.findByRole("checkbox", { name: "DreamLeague Season 29" })).toBeChecked();
   expect(screen.getByRole("checkbox", { name: "BLAST SLAM VII" })).toBeChecked();
   expect(screen.getByRole("checkbox", { name: "ESL One Birmingham 2026" })).not.toBeChecked();
+  expect(screen.getAllByText(/DreamLeague Season 29 → BLAST SLAM VII/).length).toBeGreaterThan(0);
 
   fireEvent.click(screen.getByRole("checkbox", { name: "ESL One Birmingham 2026" }));
   expect(screen.getByRole("checkbox", { name: "ESL One Birmingham 2026" })).toBeChecked();
 
   fireEvent.click(screen.getByRole("checkbox", { name: "DreamLeague Season 29" }));
   expect(screen.getByRole("checkbox", { name: "DreamLeague Season 29" })).not.toBeChecked();
+  expect(screen.getAllByText(/DreamLeague Season 29 → BLAST SLAM VII/).length).toBeGreaterThan(0);
+
+  fireEvent.click(screen.getByRole("button", { name: "确认" }));
   expect(screen.getAllByText(/ESL One Birmingham 2026 → BLAST SLAM VII/).length).toBeGreaterThan(0);
+  expect(window.location.search).not.toContain("baseline=");
 
   fireEvent.click(screen.getByRole("checkbox", { name: "ESL One Birmingham 2026" }));
   expect(screen.getByRole("checkbox", { name: "ESL One Birmingham 2026" })).toBeChecked();
+});
+
+test("shows independent hero heat rankings for each selected event", async () => {
+  render(<App />);
+
+  fireEvent.click(await screen.findByRole("button", { name: "英雄热度" }));
+
+  const dreamLeagueColumn = screen.getByRole("heading", { name: "DreamLeague Season 29" }).closest(".event-ranking-column");
+  expect(dreamLeagueColumn).not.toBeNull();
+  const dreamLeague = within(dreamLeagueColumn as HTMLElement);
+  expect(dreamLeague.getByText("帕克 / Puck")).toBeInTheDocument();
+  expect(dreamLeague.getByText("56.8%")).toBeInTheDocument();
+  expect(dreamLeague.getByText("斧王 / Axe")).toBeInTheDocument();
+  expect(dreamLeague.getByText("27.0%")).toBeInTheDocument();
+
+  const blastColumn = screen.getByRole("heading", { name: "BLAST SLAM VII" }).closest(".event-ranking-column");
+  expect(blastColumn).not.toBeNull();
+  const blast = within(blastColumn as HTMLElement);
+  expect(blast.getByText("帕克 / Puck")).toBeInTheDocument();
+  expect(blast.getByText("82.4%")).toBeInTheDocument();
+  expect(blast.getByText("斧王 / Axe")).toBeInTheDocument();
+  expect(blast.getByText("29.4%")).toBeInTheDocument();
+  expect(blast.getByText("幻影长矛手 / Phantom Lancer")).toBeInTheDocument();
+});
+
+test("uses confirmed roster positions when a position filter is applied", async () => {
+  render(<App />);
+
+  await screen.findByRole("button", { name: "热度变化" });
+  fireEvent.click(screen.getByRole("button", { name: "3" }));
+  fireEvent.click(screen.getByRole("button", { name: "确认" }));
+  fireEvent.click(screen.getByRole("button", { name: "英雄热度" }));
+
+  const blastColumn = screen.getByRole("heading", { name: "BLAST SLAM VII" }).closest(".event-ranking-column");
+  expect(blastColumn).not.toBeNull();
+  const blast = within(blastColumn as HTMLElement);
+  expect(blast.getByText("斧王 / Axe")).toBeInTheDocument();
+  expect(blast.getByText("3号位 确认")).toBeInTheDocument();
+  expect(blast.queryByText("帕克 / Puck")).not.toBeInTheDocument();
 });
 
 test("renders official hero portrait from the npc hero key", async () => {
@@ -355,37 +504,30 @@ test("renders official hero portrait from the npc hero key", async () => {
   expect(portrait).toHaveAttribute("src", expect.stringContaining("cdn.cloudflare.steamstatic.com"));
 });
 
-test("groups counter and synergy evidence into top 3 targets for each hero", async () => {
+test("groups the strongest global counter and synergy pairs", async () => {
   render(<App />);
 
   fireEvent.click(await screen.findByRole("button", { name: "克制配合" }));
 
-  expect(screen.getByText("英雄克制/配合 Top 3")).toBeInTheDocument();
-  const axeCard = screen.getByText("斧王 / Axe").closest(".matchup-card");
-  expect(axeCard).not.toBeNull();
-  const axe = within(axeCard as HTMLElement);
-
-  const counterSection = axe.getByText("被克制 Top 3").closest(".matchup-section");
+  expect(screen.getByText("显著克制 Top 30")).toBeInTheDocument();
+  const counterSection = screen.getByText("显著克制 Top 30").closest(".panel");
   expect(counterSection).not.toBeNull();
   const counters = within(counterSection as HTMLElement);
-  expect(counters.getByText(/幻影长矛手/)).toBeInTheDocument();
-  expect(counters.getByText(/水晶室女/)).toBeInTheDocument();
-  expect(counters.getByText(/主宰/)).toBeInTheDocument();
-  expect(counters.queryByText(/影魔/)).not.toBeInTheDocument();
-  expect(counters.getByText("对位A方胜率 33.3% · 9")).toBeInTheDocument();
-  expect(counters.getByText("先选后己方 Ban 18")).toBeInTheDocument();
-  expect(counters.getByText("先选后对方选 17")).toBeInTheDocument();
+  expect(counters.getAllByText(/水晶室女/).length).toBeGreaterThan(0);
+  expect(counters.getAllByText(/主宰/).length).toBeGreaterThan(0);
+  expect(counters.getAllByText(/影魔/).length).toBeGreaterThan(0);
+  expect(counters.getByText("选出斧王后己方ban掉水晶室女18次，高出本赛事均值+60.0pp")).toBeInTheDocument();
+  expect(counters.getByText("选出斧王后对方选出主宰17次，高出本赛事均值+56.7pp")).toBeInTheDocument();
 
-  const synergySection = axe.getByText("配合 Top 3").closest(".matchup-section");
+  expect(screen.getByText("显著配合 Top 30")).toBeInTheDocument();
+  const synergySection = screen.getByText("显著配合 Top 30").closest(".panel");
   expect(synergySection).not.toBeNull();
   const synergies = within(synergySection as HTMLElement);
-  expect(synergies.getByText(/帕克/)).toBeInTheDocument();
-  expect(synergies.getByText(/水晶室女/)).toBeInTheDocument();
-  expect(synergies.getByText(/主宰/)).toBeInTheDocument();
-  expect(synergies.queryByText(/影魔/)).not.toBeInTheDocument();
-  expect(synergies.getByText("同阵胜率 33.3% · 9")).toBeInTheDocument();
-  expect(synergies.getByText("先选后己方选 15")).toBeInTheDocument();
-  expect(synergies.getByText("先选后对方 Ban 14")).toBeInTheDocument();
+  expect(synergies.getAllByText(/水晶室女/).length).toBeGreaterThan(0);
+  expect(synergies.getAllByText(/主宰/).length).toBeGreaterThan(0);
+  expect(synergies.getAllByText(/影魔/).length).toBeGreaterThan(0);
+  expect(synergies.getByText("选出斧王后己方选出水晶室女15次，高出本赛事均值+50.0pp")).toBeInTheDocument();
+  expect(synergies.getByText("选出斧王后对方ban掉主宰14次，高出本赛事均值+46.7pp")).toBeInTheDocument();
 });
 
 test("opens hero relation details from hero avatar", async () => {
@@ -396,30 +538,108 @@ test("opens hero relation details from hero avatar", async () => {
   fireEvent.click(axeButtons[0]);
 
   expect(screen.getByText("斧王关系详情")).toBeInTheDocument();
-  const selectedRow = axeButtons[0].closest("tr");
+  const selectedRow = axeButtons[0].closest(".event-hero-row");
   expect(selectedRow?.nextElementSibling?.textContent).toContain("斧王关系详情");
-  expect(screen.getByRole("tab", { name: "克制" })).toBeInTheDocument();
-  expect(screen.getByRole("tab", { name: "配合" })).toBeInTheDocument();
-  expect(screen.getByRole("tab", { name: "近3个月热度" })).toBeInTheDocument();
-  expect(screen.getByText("克制该英雄")).toBeInTheDocument();
-  expect(screen.getAllByText(/幻影长矛手/).length).toBeGreaterThan(0);
-  expect(screen.getByText("对位 6胜3负")).toBeInTheDocument();
-  expect(screen.getByText("先选后己方 Ban 11")).toBeInTheDocument();
-  expect(screen.queryByText(/帕克/)).not.toBeInTheDocument();
-  fireEvent.click(screen.getByRole("tab", { name: "配合" }));
-  expect(screen.getByText("同阵 5胜3负")).toBeInTheDocument();
-  expect(screen.getByText("先选后对方 Ban 10")).toBeInTheDocument();
-  fireEvent.click(screen.getByRole("tab", { name: "近3个月热度" }));
-  expect(screen.getByText("最近 3 个月热度变化")).toBeInTheDocument();
-  expect(screen.getByText(/DreamLeague Season 29 → BLAST SLAM VII/)).toBeInTheDocument();
+  const detail = within(selectedRow?.nextElementSibling as HTMLElement);
+  expect(detail.getByRole("tab", { name: "被克制" })).toBeInTheDocument();
+  expect(detail.getByRole("tab", { name: "克制" })).toBeInTheDocument();
+  expect(detail.getByRole("tab", { name: "配合" })).toBeInTheDocument();
+  expect(detail.getByRole("tab", { name: "不配合" })).toBeInTheDocument();
+  expect(detail.queryByRole("tab", { name: "近3个月热度" })).not.toBeInTheDocument();
+  expect(detail.getAllByText("被克制").length).toBeGreaterThanOrEqual(2);
+
+  const banAfterASection = detail.getByText("选A后己方 Ban B").closest(".hero-relation-section");
+  expect(banAfterASection).not.toBeNull();
+  const banAfterA = within(banAfterASection as HTMLElement);
+  expect(banAfterA.getByText("水晶室女 / Crystal Maiden")).toBeInTheDocument();
+  expect(banAfterA.getByText("幻影长矛手 / Phantom Lancer")).toBeInTheDocument();
+  expect(banAfterA.getByText("选出斧王后己方ban掉水晶室女18次")).toBeInTheDocument();
+  expect(banAfterA.getByText("选出斧王后己方ban掉幻影长矛手11次")).toBeInTheDocument();
+
+  const enemyPickAfterASection = detail.getByText("选A后对方选 B").closest(".hero-relation-section");
+  expect(enemyPickAfterASection).not.toBeNull();
+  const enemyPickAfterA = within(enemyPickAfterASection as HTMLElement);
+  expect(enemyPickAfterA.getByText("主宰 / Juggernaut")).toBeInTheDocument();
+  expect(enemyPickAfterA.getByText("影魔 / Shadow Fiend")).toBeInTheDocument();
+  expect(enemyPickAfterA.getByText("幻影长矛手 / Phantom Lancer")).toBeInTheDocument();
+  expect(enemyPickAfterA.getByText("选出斧王后对方选出主宰17次")).toBeInTheDocument();
+  expect(enemyPickAfterA.getAllByRole("article")).toHaveLength(3);
+
+  const lowWinrateSection = detail.getByText("己方A对方B胜率低").closest(".hero-relation-section");
+  expect(lowWinrateSection).not.toBeNull();
+  const lowWinrate = within(lowWinrateSection as HTMLElement);
+  expect(lowWinrate.getByText("幻影长矛手 / Phantom Lancer")).toBeInTheDocument();
+  expect(lowWinrate.getByText("帕克 / Puck")).toBeInTheDocument();
+  expect(lowWinrate.getByText("斧王对阵幻影长矛手时己方5胜11负")).toBeInTheDocument();
+  expect(lowWinrate.getByText("斧王对阵帕克时己方4胜6负")).toBeInTheDocument();
+  expect(detail.queryByText(/33.9pp/)).not.toBeInTheDocument();
+
+  fireEvent.click(detail.getByRole("tab", { name: "克制" }));
+  const allyPickAfterEnemySection = detail.getByText("对方B后己方选 A").closest(".hero-relation-section");
+  expect(allyPickAfterEnemySection).not.toBeNull();
+  expect(within(allyPickAfterEnemySection as HTMLElement).getByText("对方选出主宰后己方选出斧王5次")).toBeInTheDocument();
+  const banAAfterEnemySection = detail.getByText("对方选B后 Ban A").closest(".hero-relation-section");
+  expect(banAAfterEnemySection).not.toBeNull();
+  expect(within(banAAfterEnemySection as HTMLElement).getByText("对方选出影魔后己方ban掉斧王6次")).toBeInTheDocument();
+  const highWinrateSection = detail.getByText("己方A对方B胜率高").closest(".hero-relation-section");
+  expect(highWinrateSection).not.toBeNull();
+  expect(within(highWinrateSection as HTMLElement).getByText("斧王对阵帕克时己方6胜4负")).toBeInTheDocument();
+
+  fireEvent.click(detail.getByRole("tab", { name: "配合" }));
+  const sameSideSection = detail.getByText("己方选AB胜率高").closest(".hero-relation-section");
+  expect(sameSideSection).not.toBeNull();
+  expect(within(sameSideSection as HTMLElement).getByText("选出斧王和幻影长矛手后己方10胜5负")).toBeInTheDocument();
+  const enemyBanAfterASection = detail.getByText("己方选A后对方 Ban B").closest(".hero-relation-section");
+  expect(enemyBanAfterASection).not.toBeNull();
+  const enemyBanAfterA = within(enemyBanAfterASection as HTMLElement);
+  expect(enemyBanAfterA.getByText("主宰 / Juggernaut")).toBeInTheDocument();
+  expect(enemyBanAfterA.getByText("影魔 / Shadow Fiend")).toBeInTheDocument();
+  expect(enemyBanAfterA.getByText("幻影长矛手 / Phantom Lancer")).toBeInTheDocument();
+  expect(enemyBanAfterA.getByText("选出斧王后对方ban掉主宰14次")).toBeInTheDocument();
+  expect(enemyBanAfterA.getAllByRole("article")).toHaveLength(3);
+  const allyBanAfterEnemyASection = detail.getByText("对方选A后己方 Ban B").closest(".hero-relation-section");
+  expect(allyBanAfterEnemyASection).not.toBeNull();
+  expect(within(allyBanAfterEnemyASection as HTMLElement).getByText("对方选出斧王后己方ban掉幻影长矛手10次")).toBeInTheDocument();
+  expect(detail.queryByText("先选后己方选 15")).not.toBeInTheDocument();
+  expect(enemyBanAfterA.queryByText(/帕克/)).not.toBeInTheDocument();
+
+  fireEvent.click(detail.getByRole("tab", { name: "不配合" }));
+  const antiSynergySection = detail.getByText("选出A和B后胜率低").closest(".hero-relation-section");
+  expect(antiSynergySection).not.toBeNull();
+  const antiSynergies = within(antiSynergySection as HTMLElement);
+  expect(antiSynergies.getByText("帕克 / Puck")).toBeInTheDocument();
+  expect(antiSynergies.getByText("选出斧王和帕克后己方3胜6负")).toBeInTheDocument();
 });
 
 test("opens movement hero details immediately below the clicked movement row", async () => {
   render(<App />);
 
-  const axeButtons = await screen.findAllByRole("button", { name: "查看斧王关系详情" });
-  fireEvent.click(axeButtons[0]);
+  const puckButtons = await screen.findAllByRole("button", { name: "查看帕克关系详情" });
+  fireEvent.click(puckButtons[0]);
 
-  const selectedMovementRow = axeButtons[0].closest(".rank-row");
-  expect(selectedMovementRow?.nextElementSibling?.textContent).toContain("斧王关系详情");
+  const selectedMovementRow = puckButtons[0].closest(".rank-row");
+  expect(selectedMovementRow?.nextElementSibling?.textContent).toContain("帕克关系详情");
+});
+
+test("shows first-phase ban and pick heat movement without lane relations", async () => {
+  render(<App />);
+
+  fireEvent.click(await screen.findByRole("button", { name: "首轮 BP" }));
+
+  expect(screen.getByText("首轮被 Ban 英雄")).toBeInTheDocument();
+  const firstBanPanel = screen.getByText("首轮被 Ban 英雄").closest(".panel");
+  expect(firstBanPanel).not.toBeNull();
+  const firstBans = within(firstBanPanel as HTMLElement);
+  expect(firstBans.getByText("帕克 / Puck")).toBeInTheDocument();
+  expect(firstBans.getByText("首轮 Ban 30")).toBeInTheDocument();
+  expect(firstBans.getByText("82.4% · +25.6pp")).toBeInTheDocument();
+
+  expect(screen.getByText("首轮被选英雄")).toBeInTheDocument();
+  const firstPickPanel = screen.getByText("首轮被选英雄").closest(".panel");
+  expect(firstPickPanel).not.toBeNull();
+  const firstPicks = within(firstPickPanel as HTMLElement);
+  expect(firstPicks.getByText("斧王 / Axe")).toBeInTheDocument();
+  expect(firstPicks.getByText("首轮 Pick 4")).toBeInTheDocument();
+  expect(firstPicks.getByText("首轮选择胜率 60.0%")).toBeInTheDocument();
+  expect(screen.queryByText("对线期关系")).not.toBeInTheDocument();
 });

@@ -55,10 +55,20 @@ def extract_by_match_ids(table: str, columns: list[str], match_ids: list[int], d
     return output
 
 
+def extract_by_league_ids(table: str, columns: list[str], league_ids: list[int], database: str) -> list[dict]:
+    if not league_ids:
+        return []
+    column_sql = ", ".join(columns)
+    placeholders = ",".join(["%s"] * len(league_ids))
+    sql = f"select {column_sql} from {table} where cast(league_id as bigint) in ({placeholders})"
+    return fetch_rows(database, sql, tuple(league_ids))
+
+
 def run_extraction() -> dict[str, int]:
     RAW_DIR.mkdir(parents=True, exist_ok=True)
     overview = extract_match_overview()
     match_ids = [int(row["match_id"]) for row in overview]
+    league_ids = list(all_sample_league_ids())
     counts = {
         "match_overview": write_jsonl(RAW_DIR / "match_overview.jsonl", overview),
         "match_picks_bans": write_jsonl(
@@ -104,6 +114,15 @@ def run_extraction() -> dict[str, int]:
                 "dwd_match_player_positions",
                 ["match_id", "account_id", "steamid", "name", "team", "lane_role", "hits_5m"],
                 match_ids,
+                "dwd_dota2",
+            ),
+        ),
+        "team_player_info": write_jsonl(
+            RAW_DIR / "team_player_info.jsonl",
+            extract_by_league_ids(
+                "team_player_info",
+                ["league_id", "league_name", "team_id", "team_name", "team_tag", "steamid", "position"],
+                league_ids,
                 "dwd_dota2",
             ),
         ),

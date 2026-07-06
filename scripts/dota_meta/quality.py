@@ -26,6 +26,71 @@ def _row_counts_by_match(frame: pd.DataFrame) -> dict[int, int]:
     return {int(match_id): int(count) for match_id, count in prepared.groupby("match_id_int").size().to_dict().items()}
 
 
+def _int_series(values: pd.Series) -> pd.Series:
+    return pd.to_numeric(values, errors="coerce").astype("Int64")
+
+
+def _confirmed_position_counts_by_match(
+    matches: pd.DataFrame,
+    players: pd.DataFrame,
+    league_pos: pd.DataFrame,
+    roster_pos: pd.DataFrame | None,
+) -> dict[int, int]:
+    confirmed_keys: set[tuple[int, int]] = set()
+    if not league_pos.empty and {"match_id", "steamid"}.issubset(league_pos.columns):
+        prepared = league_pos.copy()
+        prepared["match_id_int"] = _int_series(prepared["match_id"])
+        prepared["steamid_int"] = _int_series(prepared["steamid"])
+        prepared = prepared.dropna(subset=["match_id_int", "steamid_int"]).copy()
+        confirmed_keys.update(
+            (int(row["match_id_int"]), int(row["steamid_int"])) for row in prepared.to_dict("records")
+        )
+
+    if (
+        roster_pos is not None
+        and not roster_pos.empty
+        and not matches.empty
+        and not players.empty
+        and {"league_id", "steamid", "position"}.issubset(roster_pos.columns)
+    ):
+        match_context = matches.copy()
+        match_context["match_id_int"] = _int_series(match_context["match_id"])
+        match_context["league_id_int"] = _int_series(match_context["league_id"]) if "league_id" in match_context else pd.NA
+        match_context = match_context.dropna(subset=["match_id_int", "league_id_int"]).copy()
+        player_context = players.copy()
+        player_context["match_id_int"] = _int_series(player_context["match_id"])
+        player_context["steamid_int"] = _int_series(player_context["steamid"]) if "steamid" in player_context else pd.NA
+        player_context = player_context.dropna(subset=["match_id_int", "steamid_int"]).copy()
+        roster = roster_pos.copy()
+        roster["league_id_int"] = _int_series(roster["league_id"])
+        roster["steamid_int"] = _int_series(roster["steamid"])
+        roster["position"] = _int_series(roster["position"])
+        roster = roster.dropna(subset=["league_id_int", "steamid_int", "position"]).copy()
+        for column in ["league_id_int", "steamid_int", "position"]:
+            roster[column] = roster[column].astype("int64")
+        roster = roster[roster["position"].between(1, 5)].copy()
+        position_counts = (
+            roster.groupby(["league_id_int", "steamid_int"])["position"]
+            .nunique()
+            .reset_index(name="position_count")
+        )
+        roster = roster.merge(position_counts, on=["league_id_int", "steamid_int"], how="left")
+        roster = roster[roster["position_count"].eq(1)][["league_id_int", "steamid_int"]].drop_duplicates()
+        roster_matches = player_context.merge(
+            match_context[["match_id_int", "league_id_int"]],
+            on="match_id_int",
+            how="inner",
+        ).merge(roster, on=["league_id_int", "steamid_int"], how="inner")
+        confirmed_keys.update(
+            (int(row["match_id_int"]), int(row["steamid_int"])) for row in roster_matches.to_dict("records")
+        )
+
+    counts: Counter[int] = Counter()
+    for match_id, _steamid in confirmed_keys:
+        counts[match_id] += 1
+    return dict(counts)
+
+
 def _event_match_map(matches: pd.DataFrame) -> dict[str, list[int]]:
     if matches.empty:
         return {}
@@ -49,12 +114,13 @@ def validate_raw_coverage(
     players: pd.DataFrame,
     league_pos: pd.DataFrame,
     raw_pos: pd.DataFrame | None = None,
+    roster_pos: pd.DataFrame | None = None,
 ) -> dict[str, Any]:
     issues: list[dict[str, Any]] = []
     match_ids = sorted(_match_ids(matches))
     bp_counts = _row_counts_by_match(bp)
     player_counts = _row_counts_by_match(players)
-    confirmed_pos_counts = _row_counts_by_match(league_pos)
+    confirmed_pos_counts = _confirmed_position_counts_by_match(matches, players, league_pos, roster_pos)
     raw_pos_counts = _row_counts_by_match(raw_pos if raw_pos is not None else pd.DataFrame())
 
     for match_id in match_ids:

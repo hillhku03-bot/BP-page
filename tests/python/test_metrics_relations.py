@@ -44,14 +44,25 @@ def test_enemy_ban_after_a_is_synergy_evidence():
     assert evidence.iloc[0]["sample_size"] == 1
 
 
-def test_derived_position_uses_player_team_when_raw_position_has_team():
+def test_position_metrics_ignore_unconfirmed_raw_positions():
     matches = pd.DataFrame([{"match_id": 1, "event_group": "A"}])
     players = pd.DataFrame([{"match_id": 1, "steamid": 101, "hero_id": 11, "team": 2, "win": 1}])
     raw_pos = pd.DataFrame([{"match_id": 1, "steamid": 101, "team": 2, "lane_role": 1, "hits_5m": 18}])
 
     metrics = build_position_metrics(matches, players, pd.DataFrame(), raw_pos)
 
+    assert metrics.empty
+
+
+def test_roster_position_metrics_count_as_confirmed_positions():
+    matches = pd.DataFrame([{"match_id": 1, "event_group": "A", "league_id": 100}])
+    players = pd.DataFrame([{"match_id": 1, "steamid": 101, "hero_id": 11, "team": 2, "win": 1}])
+    roster_pos = pd.DataFrame([{"league_id": 100, "steamid": 101, "position": 1}])
+    raw_pos = pd.DataFrame([{"match_id": 1, "steamid": 101, "team": 2, "lane_role": 3, "hits_5m": 0}])
+
+    metrics = build_position_metrics(matches, players, pd.DataFrame(), raw_pos, roster_pos)
+
     row = metrics.iloc[0]
     assert row["hero_id"] == 11
     assert row["position"] == 1
-    assert row["confidence_flag"] == "derived"
+    assert row["confidence_flag"] == "confirmed"

@@ -41,8 +41,9 @@ def _empty_columns(columns: list[str]) -> pd.DataFrame:
 def normalize_matches(matches: pd.DataFrame) -> pd.DataFrame:
     output = matches.copy()
     if output.empty:
-        return _empty_columns(["match_id", "match_id_int", "event_group"])
+        return _empty_columns(["match_id", "match_id_int", "event_group", "league_id_int"])
     output["match_id_int"] = _int_series(output["match_id"])
+    output["league_id_int"] = _int_series(output["league_id"]) if "league_id" in output else pd.NA
     output = output.dropna(subset=["match_id_int"]).copy()
     output["match_id_int"] = output["match_id_int"].astype("int64")
     return output
@@ -194,15 +195,41 @@ def _normalize_raw_positions(raw_pos: pd.DataFrame) -> pd.DataFrame:
     return raw
 
 
+def _normalize_roster_positions(roster_pos: pd.DataFrame) -> pd.DataFrame:
+    if roster_pos.empty:
+        return _empty_columns(["league_id_int", "steamid_int", "position"])
+    roster = roster_pos.copy()
+    roster["league_id_int"] = _int_series(roster["league_id"]) if "league_id" in roster else pd.NA
+    roster["steamid_int"] = _int_series(roster["steamid"])
+    roster["position"] = _int_series(roster["position"])
+    roster = roster.dropna(subset=["league_id_int", "steamid_int", "position"]).copy()
+    for column in ["league_id_int", "steamid_int", "position"]:
+        roster[column] = roster[column].astype("int64")
+    roster = roster[roster["position"].between(1, 5)].copy()
+    position_counts = (
+        roster.groupby(["league_id_int", "steamid_int"])["position"]
+        .nunique()
+        .reset_index(name="position_count")
+    )
+    roster = roster.merge(position_counts, on=["league_id_int", "steamid_int"], how="left")
+    roster = roster[roster["position_count"].eq(1)].copy()
+    return roster[["league_id_int", "steamid_int", "position"]].drop_duplicates()
+
+
 def build_position_records(
     matches: pd.DataFrame,
     players: pd.DataFrame,
     league_pos: pd.DataFrame,
     raw_pos: pd.DataFrame,
+    roster_pos: pd.DataFrame | None = None,
+    include_derived: bool = False,
 ) -> pd.DataFrame:
     matches_norm = normalize_matches(matches)
+    match_context_columns = ["match_id_int", "event_group"]
+    if "league_id_int" in matches_norm:
+        match_context_columns.append("league_id_int")
     players_norm = normalize_players(players).merge(
-        matches_norm[["match_id_int", "event_group"]],
+        matches_norm[match_context_columns],
         on="match_id_int",
         how="inner",
     )
@@ -258,8 +285,39 @@ def build_position_records(
         ]
 
     confirmed_keys = set(zip(confirmed["match_id_int"], confirmed["steamid_int"]))
+    roster_confirmed_rows: list[dict[str, object]] = []
+    roster = _normalize_roster_positions(roster_pos if roster_pos is not None else pd.DataFrame())
+    if not roster.empty and not players_norm.empty and "league_id_int" in players_norm:
+        roster_source = players_norm.dropna(subset=["league_id_int", "steamid_int"]).merge(
+            roster,
+            on=["league_id_int", "steamid_int"],
+            how="inner",
+        )
+        roster_source = roster_source.merge(raw_support, on=["match_id_int", "steamid_int"], how="left")
+        for row in roster_source.to_dict("records"):
+            key = (row["match_id_int"], row["steamid_int"])
+            if key in confirmed_keys:
+                continue
+            roster_confirmed_rows.append(
+                {
+                    "event_group": row["event_group"],
+                    "match_id_int": int(row["match_id_int"]),
+                    "steamid_int": int(row["steamid_int"]),
+                    "hero_id": int(row["hero_id"]),
+                    "team_int": int(row["team_int"]),
+                    "win_bool": bool(row["win_bool"]),
+                    "position": int(row["position"]),
+                    "confidence_flag": "confirmed",
+                    "lane_role": row.get("lane_role"),
+                    "hits_5m": row.get("hits_5m"),
+                }
+            )
+    roster_confirmed = pd.DataFrame(roster_confirmed_rows)
+    confirmed = pd.concat([confirmed, roster_confirmed], ignore_index=True)
+    confirmed_keys = set(zip(confirmed["match_id_int"], confirmed["steamid_int"]))
+
     derived_rows: list[dict[str, object]] = []
-    if not raw.empty and not players_norm.empty:
+    if include_derived and not raw.empty and not players_norm.empty:
         raw_for_join = raw.drop(columns=["team_int"], errors="ignore")
         derived_source = raw_for_join.merge(
             players_norm[["match_id_int", "steamid_int", "hero_id", "team_int", "win_bool", "event_group"]],
@@ -301,8 +359,9 @@ def build_position_metrics(
     players: pd.DataFrame,
     league_pos: pd.DataFrame,
     raw_pos: pd.DataFrame,
+    roster_pos: pd.DataFrame | None = None,
 ) -> pd.DataFrame:
-    combined = build_position_records(matches, players, league_pos, raw_pos)
+    combined = build_position_records(matches, players, league_pos, raw_pos, roster_pos)
     if combined.empty:
         return _empty_columns(
             [
@@ -488,8 +547,9 @@ def build_laning_relations(
     players: pd.DataFrame,
     league_pos: pd.DataFrame,
     raw_pos: pd.DataFrame,
+    roster_pos: pd.DataFrame | None = None,
 ) -> pd.DataFrame:
-    position_rows = build_position_records(matches, players, league_pos, raw_pos)
+    position_rows = build_position_records(matches, players, league_pos, raw_pos, roster_pos, include_derived=True)
     records: list[dict[str, object]] = []
     if position_rows.empty:
         return _empty_columns(
@@ -600,6 +660,7 @@ def load_raw_frames() -> dict[str, pd.DataFrame]:
         "players": read_jsonl(RAW_DIR / "players.jsonl"),
         "heroes": read_jsonl(RAW_DIR / "heroes.jsonl"),
         "league_pos": read_jsonl(RAW_DIR / "match_league_position.jsonl"),
+        "roster_pos": read_jsonl(RAW_DIR / "team_player_info.jsonl"),
         "raw_pos": read_jsonl(RAW_DIR / "match_player_positions.jsonl"),
     }
 
@@ -615,6 +676,7 @@ def build_metric_packages() -> dict[str, int]:
         frames["players"],
         frames["league_pos"],
         frames["raw_pos"],
+        frames["roster_pos"],
     )
     relations = build_pair_relations(frames["matches"], frames["bp"], frames["players"])
     laning_relations = build_laning_relations(
@@ -622,6 +684,7 @@ def build_metric_packages() -> dict[str, int]:
         frames["players"],
         frames["league_pos"],
         frames["raw_pos"],
+        frames["roster_pos"],
     )
     events = (
         normalize_matches(frames["matches"])

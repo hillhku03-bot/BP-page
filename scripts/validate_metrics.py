@@ -18,6 +18,7 @@ def main() -> None:
         frames["players"],
         frames["league_pos"],
         frames["raw_pos"],
+        frames["roster_pos"],
     )
     write_quality_report(report)
     print(f"matches: {report['totals']['matches']}")

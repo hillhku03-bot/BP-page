@@ -1,0 +1,26 @@
+{
+  "target_event_groups": [
+    "BLAST SLAM VII",
+    "EWC 2026 Regional Qualifiers",
+    "TI 2026 Regional Qualifiers"
+  ],
+  "target_league_ids": [
+    19101,
+    19699,
+    19890,
+    19891,
+    19892,
+    19893,
+    19894
+  ],
+  "matches": 552,
+  "players": 5770,
+  "position_metric_rows": 557,
+  "missing_rows": 424,
+  "missing_excel": "C:\\Users\\Di\\Desktop\\BP Page\\outputs\\dota2pro_position_backfill\\dota2pro_position_missing.xlsx",
+  "complete_counts": {
+    "BLAST SLAM VII": 95,
+    "EWC 2026 Regional Qualifiers": 206,
+    "TI 2026 Regional Qualifiers": 143
+  }
+}
