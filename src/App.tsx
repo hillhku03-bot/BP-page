@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { Fragment, useEffect, useMemo, useState } from "react";
 import {
   Activity,
   ArrowDownRight,
@@ -34,6 +34,8 @@ const tabs: Array<{ key: TabKey; label: string }> = [
 const evidenceLabels: Record<string, string> = {
   vs_winrate_counter: "对位胜率",
   same_side_winrate_synergy: "同阵胜率",
+  same_side_pick_after_a_synergy: "先选后己方选",
+  ally_pick_after_a_synergy: "先选后己方选",
   enemy_pick_after_a_counter: "先选后对方选",
   own_ban_after_a_counter: "先选后己方 Ban",
   enemy_ban_after_a_synergy: "先选后对方 Ban",
@@ -46,6 +48,11 @@ const bpSequenceEvidenceTypes = new Set([
   "enemy_pick_after_a_counter",
   "own_ban_after_a_counter",
   "enemy_ban_after_a_synergy"
+]);
+
+const sameSidePickAfterASynergyEvidenceTypes = new Set([
+  "same_side_pick_after_a_synergy",
+  "ally_pick_after_a_synergy"
 ]);
 
 const relationGroupLabels: Record<HeroRelationGroupKey, string> = {
@@ -68,6 +75,8 @@ interface HeroRelationDetailItem {
   otherHeroId: number;
   groupKey: HeroRelationGroupKey;
   totalSample: number;
+  strongestRate: number;
+  hasWinningEvidence: boolean;
   detailTexts: string[];
 }
 
@@ -80,6 +89,22 @@ interface HeroRecentHeatRow extends HeroEventMetric {
   delta: number | null;
   previousEvent: string;
   eventDate: string;
+}
+
+interface MatchupTarget {
+  otherHeroId: number;
+  totalSample: number;
+  strongestScore: number;
+  detailTexts: string[];
+  detailMap: Map<string, string>;
+}
+
+interface MatchupHeroRow {
+  heroId: number;
+  counteredBy: MatchupTarget[];
+  synergies: MatchupTarget[];
+  totalSample: number;
+  strongestScore: number;
 }
 
 function pct(value: number | null | undefined, digits = 1) {
@@ -116,6 +141,35 @@ function orderedEvents(data: AppData) {
   return [...data.events].sort((a, b) => a.first_match.localeCompare(b.first_match));
 }
 
+function defaultEventGroups(data: AppData) {
+  return orderedEvents(data)
+    .slice(-2)
+    .map((event) => event.event_group);
+}
+
+function selectedEvents(data: AppData, filters: AppFilters) {
+  const events = orderedEvents(data);
+  const selected = new Set(filters.eventGroups);
+  const rows = filters.eventGroups.length > 0 ? events.filter((event) => selected.has(event.event_group)) : [];
+  if (rows.length >= 2) {
+    return rows;
+  }
+  if (rows.length === 1) {
+    const index = events.findIndex((event) => event.event_group === rows[0].event_group);
+    const paired = index > 0 ? [events[index - 1], rows[0]] : events.slice(0, 2);
+    return paired.filter(Boolean);
+  }
+  return events.slice(-2);
+}
+
+function selectedEventGroups(data: AppData, filters: AppFilters) {
+  return selectedEvents(data, filters).map((event) => event.event_group);
+}
+
+function sameEventGroups(left: string[], right: string[]) {
+  return left.length === right.length && left.every((eventGroup, index) => eventGroup === right[index]);
+}
+
 function latestEventDate(data: AppData) {
   return orderedEvents(data).reduce((latest, event) => {
     const candidate = new Date(event.last_match || event.first_match);
@@ -143,7 +197,7 @@ function confidenceLabel(flag: string | undefined) {
 }
 
 function eventMatches(filters: AppFilters, eventGroup: string) {
-  return filters.eventGroup === "all" || filters.eventGroup === eventGroup;
+  return filters.eventGroups.length === 0 || filters.eventGroups.includes(eventGroup);
 }
 
 function useHeroTools(data: AppData | null) {
@@ -239,6 +293,22 @@ export function App() {
     window.history.replaceState(null, "", `${window.location.pathname}?${query}`);
   }, [filters]);
 
+  useEffect(() => {
+    if (!data) {
+      return;
+    }
+    const normalized = selectedEventGroups(data, filters);
+    if (sameEventGroups(normalized, filters.eventGroups)) {
+      return;
+    }
+    setFilters((current) => {
+      const nextEventGroups = selectedEventGroups(data, current);
+      return sameEventGroups(nextEventGroups, current.eventGroups)
+        ? current
+        : { ...current, eventGroups: nextEventGroups };
+    });
+  }, [data, filters]);
+
   if (error) {
     return (
       <main className="app-shell">
@@ -259,8 +329,10 @@ export function App() {
     );
   }
 
+  const effectiveFilters = { ...filters, eventGroups: selectedEventGroups(data, filters) };
+
   const filteredMetrics = data.heroEventMetrics
-    .filter((metric) => metricPassesFilters(metric, filters, tools))
+    .filter((metric) => metricPassesFilters(metric, effectiveFilters, tools))
     .sort((a, b) => b.heat_rate - a.heat_rate || b.pick_count + b.ban_count - (a.pick_count + a.ban_count));
 
   const totalMatches = data.dataQuality.totals.matches;
@@ -287,7 +359,7 @@ export function App() {
           <SummaryCard icon={ShieldCheck} label="质量异常" value={`${data.dataQuality.totals.issue_count}`} />
         </section>
 
-        <FilterBar data={data} filters={filters} onChange={setFilters} />
+        <FilterBar data={data} filters={effectiveFilters} onChange={setFilters} />
         <QualityPanel data={data} rawPositionRate={rawPositionRate} />
 
         <nav className="tab-strip" aria-label="dashboard tabs">
@@ -308,7 +380,7 @@ export function App() {
             data={data}
             rows={filteredMetrics.slice(0, 24)}
             tools={tools}
-            filters={filters}
+            filters={effectiveFilters}
             selectedHeroId={selectedHeroId}
             onSelectHero={setSelectedHeroId}
           />
@@ -316,14 +388,14 @@ export function App() {
         {activeTab === "movement" && (
           <MovementPanel
             data={data}
-            filters={filters}
+            filters={effectiveFilters}
             tools={tools}
             selectedHeroId={selectedHeroId}
             onSelectHero={setSelectedHeroId}
           />
         )}
-        {activeTab === "relations" && <RelationsPanel data={data} filters={filters} tools={tools} />}
-        {activeTab === "bp_laning" && <BpLaningPanel data={data} filters={filters} tools={tools} />}
+        {activeTab === "relations" && <RelationsPanel data={data} filters={effectiveFilters} tools={tools} />}
+        {activeTab === "bp_laning" && <BpLaningPanel data={data} filters={effectiveFilters} tools={tools} />}
       </section>
     </main>
   );
@@ -359,19 +431,40 @@ function FilterBar({
   onChange: (filters: AppFilters) => void;
 }) {
   const update = (patch: Partial<AppFilters>) => onChange({ ...filters, ...patch });
+  const eventOrder = orderedEvents(data);
+  const selectedSet = new Set(filters.eventGroups);
+  const toggleEvent = (eventGroup: string) => {
+    const isSelected = selectedSet.has(eventGroup);
+    if (isSelected && filters.eventGroups.length <= 2) {
+      return;
+    }
+    const nextSelection = isSelected
+      ? filters.eventGroups.filter((selected) => selected !== eventGroup)
+      : [...filters.eventGroups, eventGroup];
+    update({
+      eventGroups: eventOrder
+        .filter((event) => nextSelection.includes(event.event_group))
+        .map((event) => event.event_group)
+    });
+  };
+
   return (
     <section className="filter-bar" aria-label="filters">
-      <label>
-        <span>赛事</span>
-        <select value={filters.eventGroup} onChange={(event) => update({ eventGroup: event.target.value })}>
-          <option value="all">全样本</option>
-          {data.events.map((event) => (
-            <option key={event.event_group} value={event.event_group}>
-              {event.event_group}
-            </option>
+      <div className="event-multi">
+        <span>赛事对比</span>
+        <div className="event-checkbox-grid">
+          {eventOrder.map((event) => (
+            <label className="event-check" key={event.event_group}>
+              <input
+                checked={selectedSet.has(event.event_group)}
+                onChange={() => toggleEvent(event.event_group)}
+                type="checkbox"
+              />
+              <span>{event.event_group}</span>
+            </label>
           ))}
-        </select>
-      </label>
+        </div>
+      </div>
 
       <div className="segmented" aria-label="position filter">
         {["all", "1", "2", "3", "4", "5"].map((position) => (
@@ -470,6 +563,8 @@ function HeroRankingPanel({
   selectedHeroId: number | null;
   onSelectHero: (heroId: number | null) => void;
 }) {
+  const [selectedRowKey, setSelectedRowKey] = useState<string | null>(null);
+
   return (
     <section className="panel">
       <div className="panel-header">
@@ -493,40 +588,56 @@ function HeroRankingPanel({
               <th>位置</th>
             </tr>
           </thead>
-            <tbody>
-              {rows.map((row) => (
-                <tr key={`${row.event_group}-${row.hero_id}`}>
+          <tbody>
+            {rows.map((row) => {
+              const rowKey = `${row.event_group}-${row.hero_id}`;
+              const rowSelected = selectedHeroId === row.hero_id && selectedRowKey === rowKey;
+              return (
+                <Fragment key={rowKey}>
+                  <tr>
                   <td className="hero-cell">
                     <HeroAvatarButton
                       heroId={row.hero_id}
                       tools={tools}
-                      selected={selectedHeroId === row.hero_id}
-                      onClick={() => onSelectHero(selectedHeroId === row.hero_id ? null : row.hero_id)}
+                      selected={rowSelected}
+                      onClick={() => {
+                        setSelectedRowKey(rowSelected ? null : rowKey);
+                        onSelectHero(rowSelected ? null : row.hero_id);
+                      }}
                     />
                   </td>
                   <td>{row.event_group}</td>
-                <td>
-                  <BarValue value={row.heat_rate} />
-                </td>
-                <td>{row.pick_count}</td>
-                <td>{row.ban_count}</td>
-                <td>{pct(row.win_rate)}</td>
-                <td>{pct(row.first_phase_contest_rate)}</td>
-                <td>{tools.positionSummary(row.event_group, row.hero_id) || "-"}</td>
-              </tr>
-            ))}
+                  <td>
+                    <BarValue value={row.heat_rate} />
+                  </td>
+                  <td>{row.pick_count}</td>
+                  <td>{row.ban_count}</td>
+                  <td>{pct(row.win_rate)}</td>
+                  <td>{pct(row.first_phase_contest_rate)}</td>
+                  <td>{tools.positionSummary(row.event_group, row.hero_id) || "-"}</td>
+                </tr>
+                  {rowSelected && (
+                    <tr className="hero-detail-table-row">
+                      <td colSpan={8}>
+                        <HeroRelationDetailPanel
+                          heroId={row.hero_id}
+                          data={data}
+                          filters={filters}
+                          tools={tools}
+                          onClose={() => {
+                            setSelectedRowKey(null);
+                            onSelectHero(null);
+                          }}
+                        />
+                      </td>
+                    </tr>
+                  )}
+                </Fragment>
+              );
+            })}
           </tbody>
         </table>
       </div>
-      {selectedHeroId !== null && (
-        <HeroRelationDetailPanel
-          heroId={selectedHeroId}
-          data={data}
-          filters={filters}
-          tools={tools}
-          onClose={() => onSelectHero(null)}
-        />
-      )}
       <footer className="panel-foot">{numberFormat.format(data.heroEventMetrics.length)} 条英雄-赛事指标</footer>
     </section>
   );
@@ -579,6 +690,18 @@ function HeroAvatarButton({
 }
 
 function classifyRelation(row: HeroPairRelation, heroId: number): { groupKey: HeroRelationGroupKey; otherHeroId: number } | null {
+  if (
+    (row.evidence_type === "enemy_pick_after_a_counter" || row.evidence_type === "own_ban_after_a_counter") &&
+    row.hero_a_id === heroId
+  ) {
+    return { groupKey: "countered_by", otherHeroId: row.hero_b_id };
+  }
+  if (
+    (row.evidence_type === "enemy_pick_after_a_counter" || row.evidence_type === "own_ban_after_a_counter") &&
+    row.hero_b_id === heroId
+  ) {
+    return { groupKey: "counters", otherHeroId: row.hero_a_id };
+  }
   if (row.relation_type === "counter" && row.hero_b_id === heroId) {
     return { groupKey: "countered_by", otherHeroId: row.hero_a_id };
   }
@@ -604,6 +727,187 @@ function evidenceDetailText(row: HeroPairRelation) {
   return `${evidenceLabels[row.evidence_type] ?? row.evidence_type} ${row.sample_size}`;
 }
 
+const winningEvidenceTypes = new Set(["vs_winrate_counter", "same_side_winrate_synergy"]);
+
+function isWinningEvidence(row: HeroPairRelation) {
+  return winningEvidenceTypes.has(row.evidence_type);
+}
+
+function isStrongRelationEvidence(row: HeroPairRelation) {
+  if (row.confidence_flag !== "ok") {
+    return false;
+  }
+  const rate = row.rate ?? 0;
+  if (isWinningEvidence(row)) {
+    return row.sample_size >= 8 && rate >= 0.6;
+  }
+  if (bpSequenceEvidenceTypes.has(row.evidence_type)) {
+    return row.sample_size >= 10 && rate >= 0.7;
+  }
+  return false;
+}
+
+function ensureMatchupTarget(targets: Map<number, MatchupTarget>, otherHeroId: number) {
+  const existing = targets.get(otherHeroId);
+  if (existing) {
+    return existing;
+  }
+  const created: MatchupTarget = {
+    otherHeroId,
+    totalSample: 0,
+    strongestScore: 0,
+    detailTexts: [],
+    detailMap: new Map<string, string>()
+  };
+  targets.set(otherHeroId, created);
+  return created;
+}
+
+function addMatchupEvidence(
+  targets: Map<number, MatchupTarget>,
+  otherHeroId: number,
+  row: HeroPairRelation,
+  text: string,
+  score: number
+) {
+  const target = ensureMatchupTarget(targets, otherHeroId);
+  const evidenceKey = row.evidence_type;
+  if (!target.detailMap.has(evidenceKey)) {
+    target.totalSample += row.sample_size;
+  }
+  target.strongestScore = Math.max(target.strongestScore, score);
+  target.detailMap.set(evidenceKey, text);
+}
+
+function compactMatchupTargets(targets: Map<number, MatchupTarget>) {
+  return Array.from(targets.values())
+    .map((target) => ({
+      ...target,
+      detailTexts: Array.from(target.detailMap.values())
+    }))
+    .sort((a, b) => b.strongestScore - a.strongestScore || b.totalSample - a.totalSample || a.otherHeroId - b.otherHeroId)
+    .slice(0, 3);
+}
+
+function buildRelationOverviewRows(rows: HeroPairRelation[]): MatchupHeroRow[] {
+  const grouped = new Map<
+    number,
+    {
+      heroId: number;
+      counteredBy: Map<number, MatchupTarget>;
+      synergies: Map<number, MatchupTarget>;
+    }
+  >();
+
+  const ensureHero = (heroId: number) => {
+    const existing = grouped.get(heroId);
+    if (existing) {
+      return existing;
+    }
+    const created = {
+      heroId,
+      counteredBy: new Map<number, MatchupTarget>(),
+      synergies: new Map<number, MatchupTarget>()
+    };
+    grouped.set(heroId, created);
+    return created;
+  };
+
+  rows.forEach((row) => {
+    if (row.confidence_flag !== "ok") {
+      return;
+    }
+    const rate = row.rate ?? 0;
+    if (row.evidence_type === "vs_winrate_counter" && rate >= 0.5) {
+      const hero = ensureHero(row.hero_b_id);
+      const heroWinRate = 1 - rate;
+      addMatchupEvidence(
+        hero.counteredBy,
+        row.hero_a_id,
+        row,
+        `对位A方胜率 ${pct(heroWinRate)} · ${row.sample_size}`,
+        rate * 1000 + row.sample_size
+      );
+      return;
+    }
+
+    if (row.evidence_type === "own_ban_after_a_counter") {
+      const hero = ensureHero(row.hero_a_id);
+      addMatchupEvidence(
+        hero.counteredBy,
+        row.hero_b_id,
+        row,
+        `先选后己方 Ban ${row.sample_size}`,
+        row.sample_size
+      );
+      return;
+    }
+
+    if (row.evidence_type === "enemy_pick_after_a_counter") {
+      const hero = ensureHero(row.hero_a_id);
+      addMatchupEvidence(
+        hero.counteredBy,
+        row.hero_b_id,
+        row,
+        `先选后对方选 ${row.sample_size}`,
+        row.sample_size
+      );
+      return;
+    }
+
+    if (row.evidence_type === "same_side_winrate_synergy" && rate <= 0.5) {
+      const hero = ensureHero(row.hero_a_id);
+      addMatchupEvidence(
+        hero.synergies,
+        row.hero_b_id,
+        row,
+        `同阵胜率 ${pct(rate)} · ${row.sample_size}`,
+        (1 - rate) * 1000 + row.sample_size
+      );
+      return;
+    }
+
+    if (sameSidePickAfterASynergyEvidenceTypes.has(row.evidence_type)) {
+      const hero = ensureHero(row.hero_a_id);
+      addMatchupEvidence(
+        hero.synergies,
+        row.hero_b_id,
+        row,
+        `先选后己方选 ${row.sample_size}`,
+        row.sample_size
+      );
+      return;
+    }
+
+    if (row.evidence_type === "enemy_ban_after_a_synergy") {
+      const hero = ensureHero(row.hero_a_id);
+      addMatchupEvidence(
+        hero.synergies,
+        row.hero_b_id,
+        row,
+        `先选后对方 Ban ${row.sample_size}`,
+        row.sample_size
+      );
+    }
+  });
+
+  return Array.from(grouped.values())
+    .map((hero) => {
+      const counteredBy = compactMatchupTargets(hero.counteredBy);
+      const synergies = compactMatchupTargets(hero.synergies);
+      const allTargets = [...counteredBy, ...synergies];
+      return {
+        heroId: hero.heroId,
+        counteredBy,
+        synergies,
+        totalSample: allTargets.reduce((sum, target) => sum + target.totalSample, 0),
+        strongestScore: allTargets.reduce((max, target) => Math.max(max, target.strongestScore), 0)
+      } satisfies MatchupHeroRow;
+    })
+    .filter((hero) => hero.counteredBy.length > 0 || hero.synergies.length > 0)
+    .sort((a, b) => b.strongestScore - a.strongestScore || b.totalSample - a.totalSample || a.heroId - b.heroId);
+}
+
 function buildHeroRelationDetailItems(
   heroId: number,
   rows: HeroPairRelation[],
@@ -613,6 +917,7 @@ function buildHeroRelationDetailItems(
   rows
     .filter((row) => eventMatches(filters, row.event_group))
     .filter((row) => row.sample_size >= filters.minSample)
+    .filter(isStrongRelationEvidence)
     .forEach((row) => {
       const classified = classifyRelation(row, heroId);
       if (!classified) {
@@ -625,10 +930,14 @@ function buildHeroRelationDetailItems(
           otherHeroId: classified.otherHeroId,
           groupKey: classified.groupKey,
           totalSample: 0,
+          strongestRate: 0,
+          hasWinningEvidence: false,
           detailTexts: [],
           detailMap: new Map<string, string>()
         } satisfies HeroRelationDetailItem & { detailMap: Map<string, string> });
       current.totalSample += row.sample_size;
+      current.strongestRate = Math.max(current.strongestRate, row.rate ?? 0);
+      current.hasWinningEvidence = current.hasWinningEvidence || isWinningEvidence(row);
 
       const evidenceKey = row.evidence_type;
       const existing = current.detailMap.get(evidenceKey);
@@ -648,10 +957,19 @@ function buildHeroRelationDetailItems(
       otherHeroId: item.otherHeroId,
       groupKey: item.groupKey,
       totalSample: item.totalSample,
+      strongestRate: item.strongestRate,
+      hasWinningEvidence: item.hasWinningEvidence,
       detailTexts: Array.from(item.detailMap.values())
     });
   });
-  Object.values(result).forEach((items) => items.sort((a, b) => b.totalSample - a.totalSample));
+  Object.values(result).forEach((items) =>
+    items.sort(
+      (a, b) =>
+        Number(b.hasWinningEvidence) - Number(a.hasWinningEvidence) ||
+        b.totalSample - a.totalSample ||
+        b.strongestRate - a.strongestRate
+    )
+  );
   return result;
 }
 
@@ -699,7 +1017,7 @@ function HeroRelationGroupSection({
     <section className="hero-relation-group">
       <h4>{relationGroupLabels[groupKey]}</h4>
       {items.length === 0 ? (
-        <p className="empty-note">当前筛选下无满足样本量的证据。</p>
+        <p className="empty-note">当前筛选下暂无明显强关系。</p>
       ) : (
         <div className="hero-relation-card-list">
           {items.slice(0, 8).map((item) => (
@@ -842,18 +1160,20 @@ function MovementPanel({
   selectedHeroId: number | null;
   onSelectHero: (heroId: number | null) => void;
 }) {
+  const [selectedRowKey, setSelectedRowKey] = useState<string | null>(null);
   const rows = useMemo(() => {
-    const eventOrder = orderedEvents(data);
-    const targetEvent =
-      filters.eventGroup === "all" ? eventOrder[eventOrder.length - 1]?.event_group : filters.eventGroup;
-    const targetIndex = eventOrder.findIndex((event) => event.event_group === targetEvent);
-    const previousEvent = targetIndex > 0 ? eventOrder[targetIndex - 1].event_group : "";
+    const eventOrder = selectedEvents(data, filters);
+    const targetEvent = eventOrder[eventOrder.length - 1]?.event_group;
+    const previousEvent = eventOrder[eventOrder.length - 2]?.event_group ?? "";
+    const selectedSet = new Set(eventOrder.map((event) => event.event_group));
 
     return data.heroEventMetrics
       .filter((metric) => metric.event_group === targetEvent)
-      .filter((metric) => metricPassesFilters(metric, { ...filters, eventGroup: targetEvent }, tools))
+      .filter((metric) => metricPassesFilters(metric, { ...filters, eventGroups: targetEvent ? [targetEvent] : [] }, tools))
       .map((metric) => {
-        const samples = data.heroEventMetrics.filter((row) => row.hero_id === metric.hero_id);
+        const samples = data.heroEventMetrics.filter(
+          (row) => row.hero_id === metric.hero_id && selectedSet.has(row.event_group)
+        );
         const baseline =
           filters.baseline === "sample_average"
             ? samples.reduce((sum, item) => sum + item.heat_rate, 0) / Math.max(samples.length, 1)
@@ -875,7 +1195,11 @@ function MovementPanel({
           title={filters.baseline === "previous_event" ? "相邻赛事热度上升" : "热度上升"}
           icon={ArrowUpRight}
           rows={risingRows}
+          data={data}
+          filters={filters}
           tools={tools}
+          selectedRowKey={selectedRowKey}
+          onSelectRow={setSelectedRowKey}
           selectedHeroId={selectedHeroId}
           onSelectHero={onSelectHero}
         />
@@ -883,20 +1207,15 @@ function MovementPanel({
           title={filters.baseline === "previous_event" ? "相邻赛事热度下降" : "热度下降"}
           icon={ArrowDownRight}
           rows={fallingRows}
+          data={data}
+          filters={filters}
           tools={tools}
+          selectedRowKey={selectedRowKey}
+          onSelectRow={setSelectedRowKey}
           selectedHeroId={selectedHeroId}
           onSelectHero={onSelectHero}
         />
       </section>
-      {selectedHeroId !== null && (
-        <HeroRelationDetailPanel
-          heroId={selectedHeroId}
-          data={data}
-          filters={filters}
-          tools={tools}
-          onClose={() => onSelectHero(null)}
-        />
-      )}
     </>
   );
 }
@@ -905,14 +1224,22 @@ function MovementList({
   title,
   icon: Icon,
   rows,
+  data,
+  filters,
   tools,
+  selectedRowKey,
+  onSelectRow,
   selectedHeroId,
   onSelectHero
 }: {
   title: string;
   icon: typeof ArrowUpRight;
   rows: HeroMovementRow[];
+  data: AppData;
+  filters: AppFilters;
   tools: ReturnType<typeof useHeroTools>;
+  selectedRowKey: string | null;
+  onSelectRow: (rowKey: string | null) => void;
   selectedHeroId: number | null;
   onSelectHero: (heroId: number | null) => void;
 }) {
@@ -926,24 +1253,47 @@ function MovementList({
         <span>当前热度 / 变化</span>
       </div>
       <div className="stack-list">
-        {rows.map((row) => (
-          <div className="rank-row" key={`${row.event_group}-${row.hero_id}-${title}`}>
-            <div>
-              <HeroAvatarButton
-                heroId={row.hero_id}
-                tools={tools}
-                selected={selectedHeroId === row.hero_id}
-                onClick={() => onSelectHero(selectedHeroId === row.hero_id ? null : row.hero_id)}
-              />
-              <span>
-                {row.baseline_event} → {row.event_group}
-              </span>
-            </div>
-            <div className={row.delta >= 0 ? "delta up" : "delta down"}>
+        {rows.map((row) => {
+          const rowKey = `${row.event_group}-${row.hero_id}-${title}`;
+          const rowSelected = selectedHeroId === row.hero_id && selectedRowKey === rowKey;
+          return (
+          <Fragment key={rowKey}>
+            <div className="rank-row">
+              <div>
+                <HeroAvatarButton
+                  heroId={row.hero_id}
+                  tools={tools}
+                  selected={rowSelected}
+                  onClick={() => {
+                    onSelectRow(rowSelected ? null : rowKey);
+                    onSelectHero(rowSelected ? null : row.hero_id);
+                  }}
+                />
+                <span>
+                  {row.baseline_event} → {row.event_group}
+                </span>
+              </div>
+              <div className={row.delta >= 0 ? "delta up" : "delta down"}>
               {pct(row.heat_rate)} · {signedPct(row.delta)}
+              </div>
             </div>
-          </div>
-        ))}
+            {rowSelected && (
+              <div className="movement-detail-row">
+                <HeroRelationDetailPanel
+                  heroId={row.hero_id}
+                  data={data}
+                  filters={filters}
+                  tools={tools}
+                  onClose={() => {
+                    onSelectRow(null);
+                    onSelectHero(null);
+                  }}
+                />
+              </div>
+            )}
+          </Fragment>
+          );
+        })}
       </div>
     </section>
   );
@@ -958,29 +1308,81 @@ function RelationsPanel({
   filters: AppFilters;
   tools: ReturnType<typeof useHeroTools>;
 }) {
+  const minOverviewSample = Math.max(filters.minSample, 5);
   const rows = data.heroPairRelations
     .filter((row) => eventMatches(filters, row.event_group))
-    .filter((row) => row.sample_size >= filters.minSample)
+    .filter((row) => row.sample_size >= minOverviewSample)
     .filter((row) => !filters.heroSearch || tools.searchHit(row.hero_a_id, filters.heroSearch) || tools.searchHit(row.hero_b_id, filters.heroSearch))
     .sort((a, b) => b.sample_size - a.sample_size || (b.rate ?? 0) - (a.rate ?? 0));
-  const sequenceRows = rows.filter((row) => bpSequenceEvidenceTypes.has(row.evidence_type));
-  const winrateRows = rows.filter((row) => !bpSequenceEvidenceTypes.has(row.evidence_type));
+  const heroRows = buildRelationOverviewRows(rows);
 
   return (
     <section className="relations-layout">
-      <BpSequenceEvidencePanel rows={sequenceRows.slice(0, 24)} tools={tools} />
-      <section className="dual-grid">
-        <RelationList
-          title="胜率克制证据"
-          rows={winrateRows.filter((row) => row.relation_type === "counter").slice(0, 18)}
-          tools={tools}
-        />
-        <RelationList
-          title="胜率配合证据"
-          rows={winrateRows.filter((row) => row.relation_type === "synergy").slice(0, 18)}
-          tools={tools}
-        />
+      <section className="panel">
+        <div className="panel-header">
+          <div>
+            <GitCompare aria-hidden="true" size={18} />
+            <h2>英雄克制/配合 Top 3</h2>
+          </div>
+          <span>每个英雄 A 的被克制 / 配合目标</span>
+        </div>
+        {heroRows.length === 0 ? (
+          <p className="empty-note">当前筛选下暂无可展示的克制/配合关系。</p>
+        ) : (
+          <div className="matchup-grid">
+            {heroRows.map((hero) => (
+              <article className="matchup-card" key={hero.heroId}>
+                <div className="matchup-hero-title">
+                  <HeroAvatar heroId={hero.heroId} tools={tools} />
+                  <h3>{tools.label(hero.heroId)}</h3>
+                </div>
+                <div className="matchup-columns">
+                  <MatchupTargetList title="被克制 Top 3" items={hero.counteredBy} tools={tools} />
+                  <MatchupTargetList title="配合 Top 3" items={hero.synergies} tools={tools} />
+                </div>
+              </article>
+            ))}
+          </div>
+        )}
       </section>
+    </section>
+  );
+}
+
+function MatchupTargetList({
+  title,
+  items,
+  tools
+}: {
+  title: string;
+  items: MatchupTarget[];
+  tools: ReturnType<typeof useHeroTools>;
+}) {
+  return (
+    <section className="matchup-section">
+      <h4>{title}</h4>
+      {items.length === 0 ? (
+        <p className="empty-note">暂无命中口径</p>
+      ) : (
+        <ol className="matchup-target-list">
+          {items.map((item) => (
+            <li className="matchup-target" key={`${title}-${item.otherHeroId}`}>
+              <div className="matchup-target-title">
+                <HeroAvatar heroId={item.otherHeroId} tools={tools} />
+                <strong>{tools.label(item.otherHeroId)}</strong>
+                <b>{item.totalSample}</b>
+              </div>
+              <div className="evidence-chip-list">
+                {item.detailTexts.map((text) => (
+                  <span className="evidence-chip" key={text}>
+                    {text}
+                  </span>
+                ))}
+              </div>
+            </li>
+          ))}
+        </ol>
+      )}
     </section>
   );
 }

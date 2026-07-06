@@ -4,7 +4,7 @@ export type BaselineMode = "previous_event" | "sample_average";
 export type TabKey = "heroes" | "movement" | "relations" | "bp_laning";
 
 export interface AppFilters {
-  eventGroup: string;
+  eventGroups: string[];
   position: PositionFilter;
   confidence: ConfidenceFilter;
   baseline: BaselineMode;
@@ -13,7 +13,7 @@ export interface AppFilters {
 }
 
 export const defaultFilters: AppFilters = {
-  eventGroup: "all",
+  eventGroups: [],
   position: "all",
   confidence: "all",
   baseline: "previous_event",
@@ -32,7 +32,7 @@ const isBaseline = (value: string | null): value is BaselineMode =>
 
 export function serializeFilters(filters: AppFilters): string {
   const params = new URLSearchParams();
-  params.set("eventGroup", filters.eventGroup);
+  params.set("eventGroups", filters.eventGroups.join(","));
   params.set("position", filters.position);
   params.set("confidence", filters.confidence);
   params.set("baseline", filters.baseline);
@@ -47,8 +47,15 @@ export function parseFilters(query: string): AppFilters {
   const confidence = params.get("confidence");
   const baseline = params.get("baseline");
   const minSample = Number(params.get("minSample"));
+  const eventGroups =
+    params
+      .get("eventGroups")
+      ?.split(",")
+      .map((value) => value.trim())
+      .filter(Boolean) ??
+    (params.get("eventGroup") && params.get("eventGroup") !== "all" ? [params.get("eventGroup") as string] : []);
   return {
-    eventGroup: params.get("eventGroup") || defaultFilters.eventGroup,
+    eventGroups,
     position: isPosition(position) ? position : defaultFilters.position,
     confidence: isConfidence(confidence) ? confidence : defaultFilters.confidence,
     baseline: isBaseline(baseline) ? baseline : defaultFilters.baseline,
